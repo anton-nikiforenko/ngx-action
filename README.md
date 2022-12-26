@@ -1,27 +1,223 @@
-# NgxAction
+...will be updated with more information soon
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 13.0.0.
+# Description
 
-## Development server
+Decorator-based library allowing to synchronize Angular application parts using class-based actions.
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+# Compatibility
 
-## Code scaffolding
+| Library version | @angular/core | rxjs            |
+|--------------|----------------|-----------------|
+| \>=1        | \>=13 && <16 | \>=7 && < 8 |
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+# API
 
-## Build
+## Action examples
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+Library uses `instanceof` operator under the hood to distinguish actions.
+Thus, you may create parent action and then subscribe on it and its children separately.
 
-## Running unit tests
+```ts
+class SomeAction {}
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+class AnotherAction {
+  constructor(
+    public data: any,
+    public anotherData: any,
+    // ...
+  ) {
+  }
+}
 
-## Running end-to-end tests
+abstract class ParentAction {} // may also be subscribed to
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+class ConcreteChildAction extends ParentAction {
+  constructor(public payload: any) {
+    super();
+  }
+}
+```
 
-## Further help
+## "Actions" service
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+### Dispatch action: `Actions.dispatch(instanceOfAction)`
+
+```ts
+import { Actions } from 'ngx-action';
+
+class SomeAction {
+  constructor(public payload: any) {}
+}
+
+// ...
+Actions.dispatch(new SomeAction('payload'));
+```
+
+### Subscribe on stream of actions: `Actions.onAction(ActionClass)`
+
+```ts
+import { Actions } from 'ngx-action';
+
+// ...
+Actions.onAction(SomeAction).subscribe( // don't forget to unsubscribe
+  (action: SomeAction) => {
+    // do something
+  },
+);
+
+// ...
+Actions.onAction(SomeAction).pipe( // don't forget to unsubscribe
+  mergeMap((action: SomeAction) => doSomethingAsync(someAction.payload))
+).subscribe(
+  (result) => {
+    // do something with result
+  },
+);
+```
+
+## Decorators
+
+### @ActionHandler(Action)
+
+```ts
+import { ActionHandler, initActionHandlers, WithActionHandlers } from 'ngx-action';
+
+@WithActionHandlers() // <-- 1. apply decorator to component
+@Component(...) // or @Directive(), or @Injectable()
+export class SomeComponent {
+  constructor() {
+    initActionHandlers(this); // <-- 2. make ActionHandler decorators work
+  }
+
+  @ActionHandler(SyncAction) // 3. <-- subscribe on action
+  someActionHandler(action: SyncAction): void { // argument is optional
+    // do something synchronously
+    // errors thrown will propagate to default Angular error handler
+  }
+}
+```
+
+### @AsyncActionHandler(Action)
+
+```ts
+import { ActionHandler, initActionHandlers, WithActionHandlers } from 'ngx-action';
+import { EMPTY } from 'rxjs';
+
+@WithActionHandlers() // <-- 1.
+@Component(...) // or @Directive(), or @Injectable()
+export class SomeComponent {
+  constructor(
+    private apiService: ApiService,
+  ) {
+    initActionHandlers(this); // <-- 2.
+  }
+
+  @AsyncActionHandler(AsyncAction) // 3.
+  someActionHandler(handle$: Observable<AsyncAction>): Observable<any> {
+    return handle$.pipe(
+      mergeMap((action: AsyncAction) => {
+        return this.apiService.doSmth(action.payload).pipe(
+          // don't forget to handle possible errors,
+          // or action handler will be stopped after the first one occurs
+          catchError((error) => EMPTY),
+          tap((result) => {
+            // do something with result
+          }),
+        );
+      })
+    );
+  }
+}
+```
+
+## ActionsModule
+
+If you extract some action handlers into services and don't inject them anywhere in the app, Angular compiler will tree-shake them.
+You can prevent this by providing such services using `ActionsModule.provide()` helper method.
+
+```ts
+import { ActionHandler, ActionsModule, initActionHandlers, WithActionHandlers } from 'ngx-action';
+
+@WithActionHandlers()
+@Injectable()
+export class FeatureActionHandlersService {
+  constructor() {
+      initActionHandlers(this);
+  }
+
+  @ActionHandler(...)
+  // ...
+}
+
+@NgModule({
+  providers: [
+    // prevent tree-shaking of FeatureActionHandlersService
+    ActionsModule.provide([FeatureActionHandlersService]),
+  ],
+})
+export class FeatureModule {}
+```
+
+## rxjs helpers
+
+### dispatchOnSuccess
+//todo
+
+### dispatchOnError
+//todo
+
+### ignoreSourceErrors
+//todo
+
+# Other important notes
+
+## Action handlers lifetime
+
+The library patches `ngOnDestroy` hook under the hood.
+That's why active action handlers, **subscribed using decorators**, will unsubscribe on component, directive, or service destroy (**all pending async actions will be cancelled**).
+
+## Inheritance
+
+`@WithActionHandlers()` decorator and `initActionHandlers(this)` helper should be used with the deepest child class.
+Library will detect some cases of incorrect usage and will throw an error.
+
+## Change Detection
+
+You may need to manually trigger component change detection to update view on action trigger, because action handler is just a subscription under the hood.
+This isn't required if you store view data in Observable and subscribe on it using `async` pipe.
+
+```ts
+import { ChangeDetectorRef } from '@angular/core';
+
+@WithActionHandlers()
+@Component({
+  template: '<div>Counter: {{counter}}</div>' // <-- view value
+})
+export class SomeComponent {
+  counter = 0; // <-- property
+
+  constructor(
+    private cdr: ChangeDetectorRef,
+  ) {
+    initActionHandlers(this);
+  }
+
+  @ActionHandler(SyncAction)
+  someActionHandler() {
+    this.counter += 1; // <-- trigger change detection to update view
+    this.cdr.markForCheck();
+  }
+
+  @AsyncActionHandler(AsyncAction)
+  someActionHandler(handle$) {
+    return handle$.pipe(
+      mergeMap(() => this.apiService.doSmth().pipe(
+        tap(() => {
+          this.counter += 1;
+          this.cdr.markForCheck(); // <-- trigger change detection to update view
+        }),
+      ))
+    );
+  }
+}
+```

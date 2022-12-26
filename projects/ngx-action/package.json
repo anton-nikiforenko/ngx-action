@@ -1,0 +1,13 @@
+{
+  "name": "ngx-action",
+  "description": "Decorator-based library allowing to synchronize Angular application parts using class-based actions.",
+  "version": "1.0.0",
+  "license": "MIT",
+  "peerDependencies": {
+    "@angular/core": ">=13 <16",
+    "rxjs": ">=7 <8"
+  },
+  "dependencies": {
+    "tslib": "^2.3.0"
+  }
+}
