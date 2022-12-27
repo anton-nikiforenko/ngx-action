@@ -123,6 +123,13 @@ export class SomeComponent {
 }
 ```
 
+#### Action handlers lifetime
+
+The library patches `ngOnDestroy` hook under the hood.
+That's why active action handlers, **subscribed using decorators**,
+will unsubscribe on component, directive, or service destroy
+(**all pending async actions will be cancelled**).
+
 ## Prevent services tree-shaking
 
 If you extract some action handlers into services,
@@ -175,13 +182,6 @@ export class FeatureComponent {
   ) {}
 }
 ```
-
-#### Action handlers lifetime
-
-The library patches `ngOnDestroy` hook under the hood.
-That's why active action handlers, **subscribed using decorators**,
-will unsubscribe on component, directive, or service destroy
-(**all pending async actions will be cancelled**).
 
 ## rxjs operators
 
