@@ -1,14 +1,14 @@
-import { of, throwError }  from 'rxjs';
-import { Actions }         from '../actions';
-import { dispatchOnError } from './dispatch-on-error';
+import { Observable, of, throwError } from 'rxjs';
+import { Actions }                    from '../actions';
+import { dispatchOnError }            from './dispatch-on-error';
 
 class ErrorAction {}
 
 it('should dispatch an action on source error', () => {
-  const source$ = throwError(() => new Error('error'));
-  const spy = jasmine.createSpy();
+  const source$: Observable<never> = throwError(() => new Error('error'));
+  const spy: jasmine.Spy = jasmine.createSpy();
   Actions.onAction(ErrorAction).subscribe(spy);
-  const action = new ErrorAction();
+  const action: ErrorAction= new ErrorAction();
 
   source$.pipe(dispatchOnError(() => action)).subscribe({
     error: () => {},
@@ -19,9 +19,9 @@ it('should dispatch an action on source error', () => {
 });
 
 it('should rethrow source error', () => {
-  const error = new Error('error');
-  const source$ = throwError(() => error);
-  const spy = jasmine.createSpy();
+  const error: Error = new Error('error');
+  const source$: Observable<never> = throwError(() => error);
+  const spy: jasmine.Spy = jasmine.createSpy();
 
   source$.pipe(dispatchOnError(() => new ErrorAction())).subscribe({
     error: spy,
@@ -32,10 +32,10 @@ it('should rethrow source error', () => {
 });
 
 it(`shouldn't dispatch an action if source doesn't emit an error`, () => {
-  const source$ = of(1);
-  const spy = jasmine.createSpy();
+  const source$: Observable<number> = of(1);
+  const spy: jasmine.Spy = jasmine.createSpy();
   Actions.onAction(ErrorAction).subscribe(spy);
-  const action = new ErrorAction();
+  const action: ErrorAction = new ErrorAction();
 
   source$.pipe(dispatchOnError(() => action)).subscribe();
 

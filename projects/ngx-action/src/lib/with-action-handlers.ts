@@ -19,7 +19,7 @@ export function WithActionHandlers(): (decoratedClass: DecoratedClassType) => vo
 }
 
 function overrideNgOnDestroy(decoratedClass: DecoratedClassType): void {
-  const originalNgOnDestroy: Function = decoratedClass.prototype.ngOnDestroy;
+  const originalNgOnDestroy: any = decoratedClass.prototype.ngOnDestroy;
   decoratedClass.prototype.ngOnDestroy = function (this: DecoratedClassInstanceType) {
     originalNgOnDestroy?.call(this);
     this[destroySubjectSymbol]?.next();

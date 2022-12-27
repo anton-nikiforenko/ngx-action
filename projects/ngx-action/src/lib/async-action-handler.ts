@@ -7,7 +7,7 @@ export function AsyncActionHandler<AC extends ActionClass>(actionClass: AC) {
   return function (
     decoratedClassInstance: DecoratedClassInstanceType,
     key: string,
-    descriptor: TypedPropertyDescriptor<(handle: Observable<InstanceType<AC>>) => Observable<any>>,
+    descriptor: TypedPropertyDescriptor<(handle$: Observable<InstanceType<AC>>) => Observable<any>>,
   ): void {
     decoratedClassInstance[asyncActionHandlersSymbol] = (decoratedClassInstance[asyncActionHandlersSymbol] || []).slice();
     const asyncActionHandlers: AsyncActionHandlerMeta[] = decoratedClassInstance[asyncActionHandlersSymbol];

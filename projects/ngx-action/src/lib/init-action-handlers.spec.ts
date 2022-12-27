@@ -1,14 +1,17 @@
-import { Component, Directive, Pipe } from '@angular/core';
-import { TestBed }                    from '@angular/core/testing';
-import { initActionHandlers }         from './init-action-handlers';
-import { WithActionHandlers }         from './with-action-handlers';
+import { Component, Directive, Pipe, PipeTransform } from '@angular/core';
+import { TestBed }                                   from '@angular/core/testing';
+import { initActionHandlers }                        from './init-action-handlers';
+import { WithActionHandlers }                        from './with-action-handlers';
 
 it('should throw an error when used inside incorrect class', () => {
   expect(() => {
     @Pipe({name: 'pipe'})
-    class PipeWithActionHandlers {
+    class PipeWithActionHandlers implements PipeTransform {
       constructor() {
         initActionHandlers(this);
+      }
+
+      transform(value: any): any {
       }
     }
 

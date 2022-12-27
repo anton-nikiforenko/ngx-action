@@ -4,8 +4,8 @@ class FirstAction {}
 class SecondAction {}
 
 it('should dispatch action', () => {
-  const spy = jasmine.createSpy();
-  const action = new FirstAction();
+  const spy: jasmine.Spy = jasmine.createSpy();
+  const action: FirstAction = new FirstAction();
   Actions.onAction(FirstAction).subscribe(spy);
 
   Actions.dispatch(action);
@@ -15,9 +15,9 @@ it('should dispatch action', () => {
 });
 
 it('should subscribe on specific action', () => {
-  const spy = jasmine.createSpy();
-  const firstAction = new FirstAction();
-  const secondAction = new SecondAction();
+  const spy: jasmine.Spy = jasmine.createSpy();
+  const firstAction: FirstAction = new FirstAction();
+  const secondAction: SecondAction = new SecondAction();
   Actions.onAction(FirstAction).subscribe(spy);
 
   Actions.dispatch(firstAction);

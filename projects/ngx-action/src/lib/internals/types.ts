@@ -18,5 +18,5 @@ export interface ActionHandlerMeta {
 export interface AsyncActionHandlerMeta {
   methodName: string;
   actionClass: ActionClass;
-  method: (handle: Observable<ActionInstance>) => Observable<any>;
+  method: (handle$: Observable<ActionInstance>) => Observable<any>;
 }
