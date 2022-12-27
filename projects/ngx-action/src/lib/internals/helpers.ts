@@ -1,6 +1,6 @@
 import { ɵNG_COMP_DEF as NG_COMP_DEF, ɵNG_DIR_DEF as NG_DIR_DEF, ɵNG_PROV_DEF as NG_PROV_DEF }       from '@angular/core';
-import { isDecoratorAppliedSymbol, isInitCalledSymbol }                                              from './_symbols';
-import { ActionHandlerMeta, AsyncActionHandlerMeta, DecoratedClassInstanceType, DecoratedClassType } from './_types';
+import { isDecoratorAppliedSymbol, isInitCalledSymbol }                                              from './symbols';
+import { ActionHandlerMeta, AsyncActionHandlerMeta, DecoratedClassInstanceType, DecoratedClassType } from './types';
 
 export function isClassSupported(decoratedClass: DecoratedClassType): boolean {
   return NG_PROV_DEF in decoratedClass

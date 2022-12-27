@@ -1,9 +1,13 @@
-import { isDecoratorApplied, isInitCalled, markDecoratorApplied } from './_helpers';
-import { destroySubjectSymbol }                                   from './_symbols';
-import { DecoratedClassInstanceType, DecoratedClassType }         from './_types';
+import { isClassSupported, isDecoratorApplied, isInitCalled, markDecoratorApplied } from './internals/helpers';
+import { destroySubjectSymbol }                                                     from './internals/symbols';
+import { DecoratedClassInstanceType, DecoratedClassType }                           from './internals/types';
 
 export function WithActionHandlers(): (decoratedClass: DecoratedClassType) => void {
   return function (decoratedClass: DecoratedClassType): void {
+    if (!isClassSupported(decoratedClass)) {
+      throw new Error('@WithActionHandlers() decorator should be applied to class decorated with @Component(), @Directive(), or @Injectable().');
+    }
+
     if (isDecoratorApplied(decoratedClass)) {
       throw new Error('@WithActionHandlers() decorator should be applied only once - to the deepest child class.');
     } else {

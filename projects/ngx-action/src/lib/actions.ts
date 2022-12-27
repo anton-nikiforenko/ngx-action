@@ -1,11 +1,8 @@
 import { filter, Observable, Subject } from 'rxjs';
-import { ActionClass, ActionInstance } from './_types';
+import { ActionClass, ActionInstance } from './internals/types';
 
 export class Actions {
   private static readonly actions$: Subject<ActionInstance> = new Subject<ActionInstance>();
-
-  constructor() {
-  }
 
   public static dispatch(actionInstance: ActionInstance): void {
     this.actions$.next(actionInstance);

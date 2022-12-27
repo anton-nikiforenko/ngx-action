@@ -1,6 +1,6 @@
-import { removeParentActionHandlerIfOverwritten }                     from './_helpers';
-import { actionHandlersSymbol }                                       from './_symbols';
-import { ActionClass, ActionHandlerMeta, DecoratedClassInstanceType } from './_types';
+import { removeParentActionHandlerIfOverwritten }                     from './internals/helpers';
+import { actionHandlersSymbol }                                       from './internals/symbols';
+import { ActionClass, ActionHandlerMeta, DecoratedClassInstanceType } from './internals/types';
 
 export function ActionHandler<AC extends ActionClass>(actionClass: AC) {
   return function (

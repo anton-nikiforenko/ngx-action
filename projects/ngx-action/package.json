@@ -1,8 +1,20 @@
 {
   "name": "ngx-action",
-  "description": "Decorator-based library allowing to synchronize Angular application parts using class-based actions.",
+  "description": "Sync components of Angular application using actions and decorators.",
   "version": "1.0.0",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/anton-nikiforenko/ngx-action.git"
+  },
+  "homepage": "https://github.com/anton-nikiforenko/ngx-action#readme",
+  "bugs": {
+    "url": "https://github.com/anton-nikiforenko/ngx-action/issues"
+  },
+  "keywords": [
+    "Angular action",
+    "Angular command"
+  ],
   "peerDependencies": {
     "@angular/core": ">=13 <16",
     "rxjs": ">=7 <8"

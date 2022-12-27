@@ -1,13 +1,28 @@
-import { catchError, EMPTY, Observable, Subject, takeUntil }                                     from 'rxjs';
-import { isClassSupported, isDecoratorApplied, isInitCalled, markInitCalled }                    from './_helpers';
-import { actionHandlersSymbol, asyncActionHandlersSymbol, destroySubjectSymbol }                 from './_symbols';
-import { ActionHandlerMeta, ActionInstance, AsyncActionHandlerMeta, DecoratedClassInstanceType } from './_types';
-import { Actions }                                                                               from './actions';
+import { Observable, Subject, takeUntil } from 'rxjs';
+import { Actions }                        from './actions';
+import {
+  isClassSupported,
+  isDecoratorApplied,
+  isInitCalled,
+  markInitCalled,
+}                                         from './internals/helpers';
+import {
+  actionHandlersSymbol,
+  asyncActionHandlersSymbol,
+  destroySubjectSymbol,
+}                                         from './internals/symbols';
+import {
+  ActionHandlerMeta,
+  ActionInstance,
+  AsyncActionHandlerMeta,
+  DecoratedClassInstanceType,
+}                                         from './internals/types';
 
 export function initActionHandlers(decoratedClassInstance: DecoratedClassInstanceType): void {
   if (!isClassSupported(decoratedClassInstance.constructor)) {
     throw new Error('initActionHandlers(this) should be used inside class decorated with @Component(), @Directive(), or @Injectable().');
   }
+
   if (!isDecoratorApplied(decoratedClassInstance.constructor)) {
     throw new Error('initActionHandlers(this) should be used inside class decorated with @WithActionHandlers().');
   }
@@ -58,12 +73,6 @@ function createAsyncSubscriptions(
   asyncActionHandlers.forEach((meta: AsyncActionHandlerMeta) => {
     const handle$: Observable<ActionInstance> = Actions.onAction(meta.actionClass);
     meta.method.call(decoratedClassInstance, handle$).pipe(
-      catchError((error: unknown) => {
-        const sourceCode: string = `${decoratedClassInstance.constructor.name}: @AsyncActionHandler(${meta.actionClass.name}) ${meta.methodName}()`;
-        console.warn(`${sourceCode} has stopped work due to an unhandled error in observable.`);
-        console.warn(error);
-        return EMPTY;
-      }),
       takeUntil(destroy$),
     ).subscribe();
   });

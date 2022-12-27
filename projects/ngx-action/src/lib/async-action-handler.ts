@@ -1,7 +1,7 @@
 import { Observable }                                                      from 'rxjs';
-import { removeParentActionHandlerIfOverwritten }                          from './_helpers';
-import { asyncActionHandlersSymbol }                                       from './_symbols';
-import { ActionClass, AsyncActionHandlerMeta, DecoratedClassInstanceType } from './_types';
+import { removeParentActionHandlerIfOverwritten }                          from './internals/helpers';
+import { asyncActionHandlersSymbol }                                       from './internals/symbols';
+import { ActionClass, AsyncActionHandlerMeta, DecoratedClassInstanceType } from './internals/types';
 
 export function AsyncActionHandler<AC extends ActionClass>(actionClass: AC) {
   return function (
