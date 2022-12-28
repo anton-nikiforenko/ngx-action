@@ -18,17 +18,15 @@ it('should dispatch an action on source error', () => {
   expect(spy).toHaveBeenCalledTimes(1);
 });
 
-it('should rethrow source error', () => {
-  const error: Error = new Error('error');
-  const source$: Observable<never> = throwError(() => error);
+it(`shouldn't rethrow source error`, () => {
+  const source$: Observable<never> = throwError(() => new Error('error'));
   const spy: jasmine.Spy = jasmine.createSpy();
 
   source$.pipe(dispatchOnError(() => new ErrorAction())).subscribe({
     error: spy,
   });
 
-  expect(spy).toHaveBeenCalledWith(error);
-  expect(spy).toHaveBeenCalledTimes(1);
+  expect(spy).toHaveBeenCalledTimes(0);
 });
 
 it(`shouldn't dispatch an action if source doesn't emit an error`, () => {

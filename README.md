@@ -1,3 +1,11 @@
+# Installation
+
+```
+npm install ngx-action
+# or
+yarn add ngx-action
+```
+
 # Compatibility
 
 | Library version | @angular/core | rxjs            |
@@ -128,19 +136,21 @@ export class SomeComponent {
 The library patches `ngOnDestroy` hook under the hood.
 That's why active action handlers, **subscribed using decorators**,
 will unsubscribe on component, directive, or service destroy
-(**all pending async actions will be cancelled**).
+(**all pending async actions, like http requests, will be cancelled**).
 
 ## Prevent services tree-shaking
 
 If you extract some action handlers into services,
 and don't inject those services anywhere in the app,
-Angular compiler will remove them from bundle.
-Provide such services using `ActionsModule` to avoid this.
+Angular compiler will remove them from the bundle.
+Provide such services using `ActionsModule` to avoid this,
+or directly inject services when above technique not applicable.
+
+#### Tree-shakeable service
 
 ```ts
 import {
   ActionHandler,
-  ActionsModule,
   AsyncActionHandler,
   initActionHandlers,
   WithActionHandlers
@@ -159,6 +169,12 @@ export class FeatureActionHandlers { // <-- tree-shakeable service
   @AsyncActionHandler(...)
   // ...
 }
+```
+
+### Prevent tree-shaking at NgModule level
+
+```ts
+import { ActionsModule } from 'ngx-action';
 
 @NgModule({
   providers: [
@@ -169,8 +185,10 @@ export class FeatureActionHandlers { // <-- tree-shakeable service
 export class FeatureModule {}
 ```
 
-Helper may only be used inside modules and standalone (Angular 14+) components.
-For non-standalone components add service to constructor dependencies to prevent tree-shaking.
+### Prevent tree-shaking at Component level
+
+`ActionsModule` not applicable here (neither with standard nor with standalone components),
+so inject them directly.
 
 ```ts
 @Component({
@@ -181,6 +199,25 @@ export class FeatureComponent {
     public service: FeatureActionHandlers, // <-- inject service by yourself
   ) {}
 }
+```
+
+### Prevent Route providers tree-shaking (Angular 14+)
+
+You can use Angular `importProvidersFrom` helper with `ActionsModule`
+to prevent Route providers tree-shaking.
+
+```ts
+import { importProvidersFrom } from '@angular/core';
+import { ActionsModule } from 'ngx-action';
+
+export const routes: Routes = [
+    {
+        path: '',
+        component: SomeComponent,
+        // prevent service tree-shaking
+        providers: [importProvidersFrom(ActionsModule.provide([FeatureActionHandlers]))]
+    },
+];
 ```
 
 ## rxjs operators
@@ -203,7 +240,9 @@ Actions.onAction(SomeAction).pipe(
 ### dispatchOnError
 
 Dispatch an action when source emits error.
-Error will be rethrown and still has to be handled.
+Error will be replaced with rxjs `EMPTY` Observable (won't rethrow),
+so use `catchError` instead of `dispatchOnError`,
+if you want to add additional error handling.
 
 ```ts
 Actions.onAction(SomeAction).pipe(

@@ -1,6 +1,6 @@
-import { catchError, Observable, throwError } from 'rxjs';
-import { Actions }                            from '../actions';
-import { ActionInstance }                     from '../internals/types';
+import { catchError, EMPTY, Observable } from 'rxjs';
+import { Actions }                       from '../actions';
+import { ActionInstance }                from '../internals/types';
 
 export function dispatchOnError<Value>(
   callback: (error: unknown) => ActionInstance,
@@ -9,7 +9,7 @@ export function dispatchOnError<Value>(
     return source$.pipe(
       catchError((error: unknown) => {
         Actions.dispatch(callback(error));
-        return throwError(() => error);
+        return EMPTY;
       }),
     );
   };
