@@ -4,15 +4,20 @@ import { ActionClass, ActionInstance } from './internals/types';
 export class Actions {
   private static readonly actions$: Subject<ActionInstance> = new Subject<ActionInstance>();
 
-  public static dispatch(actionInstance: ActionInstance): void {
-    this.actions$.next(actionInstance);
+  public static dispatch(...actionInstances: ActionInstance[]): void {
+    actionInstances.forEach((actionInstance: ActionInstance) => {
+      this.actions$.next(actionInstance);
+    });
   }
 
-  public static onAction(actionClass: ActionClass): Observable<ActionInstance> {
+  public static onAction<AC extends ActionClass<InstanceType<AC>>, ACArray extends ActionClass<InstanceType<AC>>[]>(
+    ...actionClasses: [AC, ...ACArray]
+  ): Observable<InstanceType<AC> | InstanceType<ACArray[number]>> {
+    const predicate = actionClasses.length === 1
+      ? (action: ActionInstance) => action instanceof actionClasses[0]
+      : (action: ActionInstance) => actionClasses.some((actionClass: ActionClass) => action instanceof actionClass);
     return this.actions$.pipe(
-      filter((action: ActionInstance) => {
-        return action instanceof actionClass;
-      }),
+      filter(predicate),
     );
   }
 }

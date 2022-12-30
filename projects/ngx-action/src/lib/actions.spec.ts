@@ -2,6 +2,7 @@ import { Actions } from './actions';
 
 class FirstAction {}
 class SecondAction {}
+class ThirdAction {}
 
 it('should dispatch action', () => {
   const spy: jasmine.Spy = jasmine.createSpy();
@@ -14,7 +15,20 @@ it('should dispatch action', () => {
   expect(spy).toHaveBeenCalledTimes(1);
 });
 
-it('should subscribe on specific action', () => {
+it('should dispatch multiple actions', () => {
+  const spy: jasmine.Spy = jasmine.createSpy();
+  const action: FirstAction = new FirstAction();
+  const action2: FirstAction = new FirstAction();
+  Actions.onAction(FirstAction).subscribe(spy);
+
+  Actions.dispatch(action, action2);
+
+  expect(spy).toHaveBeenCalledWith(action);
+  expect(spy).toHaveBeenCalledWith(action2);
+  expect(spy).toHaveBeenCalledTimes(2);
+});
+
+it('should subscribe to specific action', () => {
   const spy: jasmine.Spy = jasmine.createSpy();
   const firstAction: FirstAction = new FirstAction();
   const secondAction: SecondAction = new SecondAction();
@@ -25,5 +39,21 @@ it('should subscribe on specific action', () => {
   Actions.dispatch(secondAction);
 
   expect(spy).toHaveBeenCalledWith(firstAction);
+  expect(spy).toHaveBeenCalledTimes(2);
+});
+
+it('should subscribe to multiple actions', () => {
+  const spy: jasmine.Spy = jasmine.createSpy();
+  const firstAction: FirstAction = new FirstAction();
+  const secondAction: SecondAction = new SecondAction();
+  const thirdAction: ThirdAction = new ThirdAction();
+  Actions.onAction(FirstAction, SecondAction).subscribe(spy);
+
+  Actions.dispatch(firstAction);
+  Actions.dispatch(secondAction);
+  Actions.dispatch(thirdAction);
+
+  expect(spy).toHaveBeenCalledWith(firstAction);
+  expect(spy).toHaveBeenCalledWith(secondAction);
   expect(spy).toHaveBeenCalledTimes(2);
 });

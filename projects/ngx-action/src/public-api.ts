@@ -2,6 +2,8 @@
  * Public API Surface of ngx-action
  */
 
+export { ActionClass } from './lib/internals/types';
+
 export * from './lib/rxjs/dispatch-on-error';
 export * from './lib/rxjs/dispatch-on-success';
 

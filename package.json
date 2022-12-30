@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "build:ngx-action": "ng build ngx-action && copyfiles LICENSE README.md dist/ngx-action",
+    "build:ngx-action": "ng build ngx-action",
     "test": "ng test --code-coverage",
     "lint": "ng lint"
   },
@@ -34,7 +34,6 @@
     "@types/node": "^12.11.1",
     "@typescript-eslint/eslint-plugin": "5.27.1",
     "@typescript-eslint/parser": "5.27.1",
-    "copyfiles": "^2.4.1",
     "eslint": "^8.17.0",
     "jasmine-core": "~3.10.0",
     "karma": "~6.3.0",

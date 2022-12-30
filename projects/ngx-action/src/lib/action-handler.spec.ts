@@ -6,18 +6,22 @@ import { initActionHandlers }               from './init-action-handlers';
 import { WithActionHandlers }               from './with-action-handlers';
 
 const componentActionHandlerSpy: jasmine.Spy = jasmine.createSpy();
+const componentMultipleActionHandlerSpy: jasmine.Spy = jasmine.createSpy();
 const componentParentOverwrittenActionHandlerSpy: jasmine.Spy = jasmine.createSpy();
 const componentChildOverwrittenActionHandlerSpy: jasmine.Spy = jasmine.createSpy();
 
 const directiveActionHandlerSpy: jasmine.Spy = jasmine.createSpy();
+const directiveMultipleActionHandlerSpy: jasmine.Spy = jasmine.createSpy();
 const directiveParentOverwrittenActionHandlerSpy: jasmine.Spy = jasmine.createSpy();
 const directiveChildOverwrittenActionHandlerSpy: jasmine.Spy = jasmine.createSpy();
 
 const serviceActionHandlerSpy: jasmine.Spy = jasmine.createSpy();
+const serviceMultipleActionHandlerSpy: jasmine.Spy = jasmine.createSpy();
 const serviceParentOverwrittenActionHandlerSpy: jasmine.Spy = jasmine.createSpy();
 const serviceChildOverwrittenActionHandlerSpy: jasmine.Spy = jasmine.createSpy();
 
 class SyncAction {}
+class SyncAction2 {}
 
 // ---------- Component ----------
 @Component({selector: 'any', template: ''})
@@ -39,6 +43,11 @@ class ComponentWithActionHandlers extends ParentComponentWithActionHandlers {
   @ActionHandler(SyncAction)
   public syncActionHandler(action: SyncAction): void {
     componentActionHandlerSpy(action);
+  }
+
+  @ActionHandler(SyncAction, SyncAction2)
+  public multipleActionHandler(action: SyncAction | SyncAction2): void {
+    componentMultipleActionHandlerSpy(action);
   }
 
   @ActionHandler(SyncAction)
@@ -67,6 +76,11 @@ class DirectiveWithActionHandlers extends ParentDirectiveWithActionHandlers {
   @ActionHandler(SyncAction)
   public syncActionHandler(action: SyncAction): void {
     directiveActionHandlerSpy(action);
+  }
+
+  @ActionHandler(SyncAction, SyncAction2)
+  public multipleActionHandler(action: SyncAction | SyncAction2): void {
+    directiveMultipleActionHandlerSpy(action);
   }
 
   @ActionHandler(SyncAction)
@@ -99,6 +113,11 @@ class ServiceWithActionHandlers extends ParentServiceWithActionHandlers {
     serviceActionHandlerSpy(action);
   }
 
+  @ActionHandler(SyncAction, SyncAction2)
+  public multipleActionHandler(action: SyncAction | SyncAction2): void {
+    serviceMultipleActionHandlerSpy(action);
+  }
+
   @ActionHandler(SyncAction)
   public override overwrittenActionHandler(action: SyncAction): void {
     serviceChildOverwrittenActionHandlerSpy(action);
@@ -111,7 +130,7 @@ export class ServiceContainer {
   }
 }
 
-describe('should subscribe on action -', () => {
+describe('should subscribe to action -', () => {
   it('component', () => {
     componentActionHandlerSpy.calls.reset();
     TestBed.configureTestingModule({
@@ -155,7 +174,60 @@ describe('should subscribe on action -', () => {
   });
 });
 
-describe('should unsubscribe on destroy of', () => {
+describe('should subscribe to multiple actions -', () => {
+  it('component', () => {
+    componentMultipleActionHandlerSpy.calls.reset();
+    TestBed.configureTestingModule({
+      declarations: [ComponentWithActionHandlers],
+    }).compileComponents();
+    TestBed.createComponent(ComponentWithActionHandlers);
+    const action: SyncAction = new SyncAction();
+    const action2: SyncAction2 = new SyncAction2();
+
+    Actions.dispatch(action);
+    Actions.dispatch(action2);
+
+    expect(componentMultipleActionHandlerSpy).toHaveBeenCalledWith(action);
+    expect(componentMultipleActionHandlerSpy).toHaveBeenCalledWith(action2);
+    expect(componentMultipleActionHandlerSpy).toHaveBeenCalledTimes(2);
+  });
+
+  it('directive', () => {
+    directiveMultipleActionHandlerSpy.calls.reset();
+    TestBed.configureTestingModule({
+      declarations: [DirectiveWithActionHandlers, DirectiveContainer],
+    }).compileComponents();
+    TestBed.createComponent(DirectiveContainer);
+    const action: SyncAction = new SyncAction();
+    const action2: SyncAction2 = new SyncAction2();
+
+    Actions.dispatch(action);
+    Actions.dispatch(action2);
+
+    expect(directiveMultipleActionHandlerSpy).toHaveBeenCalledWith(action);
+    expect(directiveMultipleActionHandlerSpy).toHaveBeenCalledWith(action2);
+    expect(directiveMultipleActionHandlerSpy).toHaveBeenCalledTimes(2);
+  });
+
+  it('service', () => {
+    serviceMultipleActionHandlerSpy.calls.reset();
+    TestBed.configureTestingModule({
+      declarations: [ServiceContainer],
+    }).compileComponents();
+    TestBed.createComponent(ServiceContainer);
+    const action: SyncAction = new SyncAction();
+    const action2: SyncAction2 = new SyncAction2();
+
+    Actions.dispatch(action);
+    Actions.dispatch(action2);
+
+    expect(serviceMultipleActionHandlerSpy).toHaveBeenCalledWith(action);
+    expect(serviceMultipleActionHandlerSpy).toHaveBeenCalledWith(action2);
+    expect(serviceMultipleActionHandlerSpy).toHaveBeenCalledTimes(2);
+  });
+});
+
+describe('should unsubscribe to destroy of', () => {
   it('component', () => {
     componentActionHandlerSpy.calls.reset();
     TestBed.configureTestingModule({

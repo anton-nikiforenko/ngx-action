@@ -55,7 +55,7 @@ function createSyncSubscriptions(
   destroy$: Subject<void>,
 ): void {
   actionHandlers.forEach((meta: ActionHandlerMeta) => {
-    Actions.onAction(meta.actionClass).pipe(
+    Actions.onAction(...meta.actionClasses).pipe(
       takeUntil(destroy$),
     ).subscribe(
       (action: ActionInstance) => {
@@ -71,7 +71,7 @@ function createAsyncSubscriptions(
   destroy$: Subject<void>,
 ): void {
   asyncActionHandlers.forEach((meta: AsyncActionHandlerMeta) => {
-    const handle$: Observable<ActionInstance> = Actions.onAction(meta.actionClass);
+    const handle$: Observable<ActionInstance> = Actions.onAction(...meta.actionClasses);
     meta.method.call(decoratedClassInstance, handle$).pipe(
       takeUntil(destroy$),
     ).subscribe();
