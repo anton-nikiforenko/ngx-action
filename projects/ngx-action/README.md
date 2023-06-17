@@ -21,9 +21,9 @@ yarn add ngx-action
 
 # Compatibility
 
-| Library version | @angular/core | rxjs            |
-|--------------|----------------|-----------------|
-| \>=1        | \>=13 && <16 | \>=7 && < 8 |
+| Library version | @angular/core | rxjs          |
+|-----------------|---------------|---------------|
+| \>=1            | \>=13 && <=16 | \>=7 && < 8   |
 
 # API
 
