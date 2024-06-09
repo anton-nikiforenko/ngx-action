@@ -1,5 +1,5 @@
 import { Component, Directive, Injectable, OnDestroy, Pipe, PipeTransform, ViewChild } from '@angular/core';
-import { ComponentFixture, TestBed }                                                   from '@angular/core/testing';
+import { TestBed }                                                                     from '@angular/core/testing';
 import { initActionHandlers }                                                          from './init-action-handlers';
 import { WithActionHandlers }                                                          from './with-action-handlers';
 
@@ -8,7 +8,7 @@ it('should throw an error when applied to incorrect class', () => {
     @WithActionHandlers()
     @Pipe({name: 'pipe'})
     class PipeWithActionHandlers implements PipeTransform {
-      transform(value: any): any {}
+      transform(value: unknown): void {}
     }
   }).toThrow(new Error('@WithActionHandlers() decorator should be applied to class decorated with @Component(), @Directive(), or @Injectable().'));
 });
@@ -88,7 +88,7 @@ describe('should call original class ngOnDestroy when applied to', () => {
     @WithActionHandlers()
     @Component({selector: 'component', template: ''})
     class ComponentWithActionHandlers implements OnDestroy {
-      ngOnDestroyCalled: boolean = false;
+      ngOnDestroyCalled = false;
 
       constructor() {
         initActionHandlers(this);
@@ -102,7 +102,7 @@ describe('should call original class ngOnDestroy when applied to', () => {
     TestBed.configureTestingModule({
       declarations: [ComponentWithActionHandlers]
     }).compileComponents();
-    const component: ComponentFixture<ComponentWithActionHandlers> = TestBed.createComponent(ComponentWithActionHandlers);
+    const component = TestBed.createComponent(ComponentWithActionHandlers);
 
     component.destroy();
 
@@ -113,7 +113,7 @@ describe('should call original class ngOnDestroy when applied to', () => {
     @WithActionHandlers()
     @Directive({selector: '[directive]'})
     class DirectiveWithActionHandlers implements OnDestroy {
-      ngOnDestroyCalled: boolean = false;
+      ngOnDestroyCalled = false;
 
       constructor() {
         initActionHandlers(this);
@@ -133,7 +133,7 @@ describe('should call original class ngOnDestroy when applied to', () => {
     TestBed.configureTestingModule({
       declarations: [DirectiveWithActionHandlers, TestComponent],
     }).compileComponents();
-    const component: ComponentFixture<TestComponent> = TestBed.createComponent(TestComponent);
+    const component = TestBed.createComponent(TestComponent);
 
     component.detectChanges();
     component.destroy();
@@ -145,7 +145,7 @@ describe('should call original class ngOnDestroy when applied to', () => {
     @WithActionHandlers()
     @Injectable()
     class ServiceWithActionHandlers implements OnDestroy {
-      ngOnDestroyCalled: boolean = false;
+      ngOnDestroyCalled = false;
 
       constructor() {
         initActionHandlers(this);
@@ -164,7 +164,7 @@ describe('should call original class ngOnDestroy when applied to', () => {
     TestBed.configureTestingModule({
       declarations: [TestComponent],
     }).compileComponents();
-    const component: ComponentFixture<TestComponent> = TestBed.createComponent(TestComponent);
+    const component = TestBed.createComponent(TestComponent);
 
     component.detectChanges();
     component.destroy();
@@ -183,7 +183,7 @@ describe(`should throw an error on destroy if helper method hasn't been called w
       TestBed.configureTestingModule({
         declarations: [ComponentWithActionHandlers]
       }).compileComponents();
-      const component: ComponentFixture<ComponentWithActionHandlers> = TestBed.createComponent(ComponentWithActionHandlers);
+      const component = TestBed.createComponent(ComponentWithActionHandlers);
 
       component.destroy();
     }).toThrow(new Error('initActionHandlers(this) should be called when decorator @WithActionHandlers() applied.'));
@@ -201,7 +201,7 @@ describe(`should throw an error on destroy if helper method hasn't been called w
       TestBed.configureTestingModule({
         declarations: [DirectiveWithActionHandlers, TestComponent]
       }).compileComponents();
-      const component: ComponentFixture<TestComponent> = TestBed.createComponent(TestComponent);
+      const component = TestBed.createComponent(TestComponent);
 
       component.destroy();
     }).toThrow(new Error('initActionHandlers(this) should be called when decorator @WithActionHandlers() applied.'));
@@ -221,7 +221,7 @@ describe(`should throw an error on destroy if helper method hasn't been called w
       TestBed.configureTestingModule({
         declarations: [TestComponent]
       }).compileComponents();
-      const component: ComponentFixture<TestComponent> = TestBed.createComponent(TestComponent);
+      const component = TestBed.createComponent(TestComponent);
 
       component.destroy();
     }).toThrow(new Error('initActionHandlers(this) should be called when decorator @WithActionHandlers() applied.'));

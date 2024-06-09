@@ -28,10 +28,16 @@ export function removeParentActionHandlerIfOverwritten<AHM extends ActionHandler
   actionHandlers: AHM[],
   childActionHandler: AHM,
 ): void {
-  const indexOfOverwrittenParentActionHandler: number = actionHandlers.findIndex(
+  const indexOfOverwrittenParentActionHandler = actionHandlers.findIndex(
     (actionHandler: AHM) => actionHandler.methodName === childActionHandler.methodName,
   );
   if (indexOfOverwrittenParentActionHandler !== -1) {
     actionHandlers.splice(indexOfOverwrittenParentActionHandler, 1);
+  }
+}
+
+export function assertIsDefined<T>(value: T): asserts value is NonNullable<T> {
+  if (value === undefined || value === null) {
+    throw new Error(`${value} is not defined`)
   }
 }

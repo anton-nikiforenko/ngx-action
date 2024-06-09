@@ -5,17 +5,18 @@ import { WithActionHandlers }                        from './with-action-handler
 
 it('should throw an error when used inside incorrect class', () => {
   expect(() => {
-    @Pipe({name: 'pipe'})
+    @Pipe({name: 'testPipe'})
     class PipeWithActionHandlers implements PipeTransform {
       constructor() {
         initActionHandlers(this);
       }
 
-      transform(value: any): any {
+      transform(value: number): number {
+        return 2;
       }
     }
 
-    @Component({selector: 'component', template: '{{1 | pipe}}'})
+    @Component({selector: 'component', template: '{{1 | testPipe}}'})
     class TestComponent {}
 
     TestBed.configureTestingModule({

@@ -4,7 +4,7 @@ import { ActionsModule }        from './actions.module';
 
 @Injectable()
 class Service {
-  public static isInitialized: boolean = false;
+  public static isInitialized = false;
 
   constructor() {
     Service.isInitialized = true;

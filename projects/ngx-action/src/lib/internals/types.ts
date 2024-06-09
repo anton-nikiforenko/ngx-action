@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Observable } from 'rxjs';
 
 export type ConstructorType<T = any> = new(...args: any[]) => T;

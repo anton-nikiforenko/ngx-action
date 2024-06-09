@@ -6,10 +6,10 @@ class SuccessAction {}
 class SuccessAction2 {}
 
 it('should dispatch an action', () => {
-  const source$: Observable<number> = of(1);
-  const spy: jasmine.Spy = jasmine.createSpy();
+  const source$ = of(1);
+  const spy = jasmine.createSpy();
   Actions.onAction(SuccessAction).subscribe(spy);
-  const action: SuccessAction = new SuccessAction();
+  const action = new SuccessAction();
 
   source$.pipe(dispatchOnSuccess(() => action)).subscribe();
 
@@ -18,11 +18,11 @@ it('should dispatch an action', () => {
 });
 
 it('should dispatch multiple actions', () => {
-  const source$: Observable<number> = of(1);
-  const spy: jasmine.Spy = jasmine.createSpy();
+  const source$ = of(1);
+  const spy = jasmine.createSpy();
   Actions.onAction(SuccessAction, SuccessAction2).subscribe(spy);
-  const action: SuccessAction = new SuccessAction();
-  const action2: SuccessAction2 = new SuccessAction2();
+  const action = new SuccessAction();
+  const action2 = new SuccessAction2();
 
   source$.pipe(dispatchOnSuccess(() => [action, action2])).subscribe();
 
@@ -32,10 +32,10 @@ it('should dispatch multiple actions', () => {
 });
 
 it(`shouldn't dispatch an action on source error`, () => {
-  const source$: Observable<never> = throwError(() => new Error('error'));
-  const spy: jasmine.Spy = jasmine.createSpy();
+  const source$ = throwError(() => new Error('error'));
+  const spy = jasmine.createSpy();
   Actions.onAction(SuccessAction).subscribe(spy);
-  const action: SuccessAction = new SuccessAction();
+  const action = new SuccessAction();
 
   source$.pipe(dispatchOnSuccess(() => action)).subscribe({
     error: () => {},

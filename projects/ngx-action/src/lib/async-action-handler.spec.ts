@@ -1,26 +1,25 @@
 import { Component, Directive, Injectable } from '@angular/core';
-import { ComponentFixture, TestBed }        from '@angular/core/testing';
+import { TestBed }                          from '@angular/core/testing';
 import { Observable, tap }                  from 'rxjs';
-import { ActionHandler }                    from './action-handler';
 import { Actions }                          from './actions';
 import { AsyncActionHandler }               from './async-action-handler';
 import { initActionHandlers }               from './init-action-handlers';
 import { WithActionHandlers }               from './with-action-handlers';
 
-const componentActionHandlerSpy: jasmine.Spy = jasmine.createSpy();
-const componentMultipleActionHandlerSpy: jasmine.Spy = jasmine.createSpy();
-const componentParentOverwrittenActionHandlerSpy: jasmine.Spy = jasmine.createSpy();
-const componentChildOverwrittenActionHandlerSpy: jasmine.Spy = jasmine.createSpy();
+const componentActionHandlerSpy = jasmine.createSpy();
+const componentMultipleActionHandlerSpy = jasmine.createSpy();
+const componentParentOverwrittenActionHandlerSpy = jasmine.createSpy();
+const componentChildOverwrittenActionHandlerSpy = jasmine.createSpy();
 
-const directiveActionHandlerSpy: jasmine.Spy = jasmine.createSpy();
-const directiveMultipleActionHandlerSpy: jasmine.Spy = jasmine.createSpy();
-const directiveParentOverwrittenActionHandlerSpy: jasmine.Spy = jasmine.createSpy();
-const directiveChildOverwrittenActionHandlerSpy: jasmine.Spy = jasmine.createSpy();
+const directiveActionHandlerSpy = jasmine.createSpy();
+const directiveMultipleActionHandlerSpy = jasmine.createSpy();
+const directiveParentOverwrittenActionHandlerSpy = jasmine.createSpy();
+const directiveChildOverwrittenActionHandlerSpy = jasmine.createSpy();
 
-const serviceActionHandlerSpy: jasmine.Spy = jasmine.createSpy();
-const serviceMultipleActionHandlerSpy: jasmine.Spy = jasmine.createSpy();
-const serviceParentOverwrittenActionHandlerSpy: jasmine.Spy = jasmine.createSpy();
-const serviceChildOverwrittenActionHandlerSpy: jasmine.Spy = jasmine.createSpy();
+const serviceActionHandlerSpy = jasmine.createSpy();
+const serviceMultipleActionHandlerSpy = jasmine.createSpy();
+const serviceParentOverwrittenActionHandlerSpy = jasmine.createSpy();
+const serviceChildOverwrittenActionHandlerSpy = jasmine.createSpy();
 
 class AsyncAction {}
 class AsyncAction2 {}
@@ -187,7 +186,7 @@ describe('should subscribe to action -', () => {
       declarations: [ComponentWithActionHandlers],
     }).compileComponents();
     TestBed.createComponent(ComponentWithActionHandlers);
-    const action: AsyncAction = new AsyncAction();
+    const action = new AsyncAction();
 
     Actions.dispatch(action);
 
@@ -201,7 +200,7 @@ describe('should subscribe to action -', () => {
       declarations: [DirectiveWithActionHandlers, DirectiveContainer],
     }).compileComponents();
     TestBed.createComponent(DirectiveContainer);
-    const action: AsyncAction = new AsyncAction();
+    const action = new AsyncAction();
 
     Actions.dispatch(action);
 
@@ -215,7 +214,7 @@ describe('should subscribe to action -', () => {
       declarations: [ServiceContainer],
     }).compileComponents();
     TestBed.createComponent(ServiceContainer);
-    const action: AsyncAction = new AsyncAction();
+    const action = new AsyncAction();
 
     Actions.dispatch(action);
 
@@ -231,8 +230,8 @@ describe('should subscribe to multiple actions -', () => {
       declarations: [ComponentWithActionHandlers],
     }).compileComponents();
     TestBed.createComponent(ComponentWithActionHandlers);
-    const action: AsyncAction = new AsyncAction();
-    const action2: AsyncAction2 = new AsyncAction2();
+    const action = new AsyncAction();
+    const action2 = new AsyncAction2();
 
     Actions.dispatch(action);
     Actions.dispatch(action2);
@@ -248,8 +247,8 @@ describe('should subscribe to multiple actions -', () => {
       declarations: [DirectiveWithActionHandlers, DirectiveContainer],
     }).compileComponents();
     TestBed.createComponent(DirectiveContainer);
-    const action: AsyncAction = new AsyncAction();
-    const action2: AsyncAction2 = new AsyncAction2();
+    const action = new AsyncAction();
+    const action2 = new AsyncAction2();
 
     Actions.dispatch(action);
     Actions.dispatch(action2);
@@ -265,8 +264,8 @@ describe('should subscribe to multiple actions -', () => {
       declarations: [ServiceContainer],
     }).compileComponents();
     TestBed.createComponent(ServiceContainer);
-    const action: AsyncAction = new AsyncAction();
-    const action2: AsyncAction2 = new AsyncAction2();
+    const action = new AsyncAction();
+    const action2 = new AsyncAction2();
 
     Actions.dispatch(action);
     Actions.dispatch(action2);
@@ -283,8 +282,8 @@ describe('should unsubscribe on destroy of', () => {
     TestBed.configureTestingModule({
       declarations: [ComponentWithActionHandlers],
     }).compileComponents();
-    const component: ComponentFixture<ComponentWithActionHandlers> = TestBed.createComponent(ComponentWithActionHandlers);
-    const action: AsyncAction = new AsyncAction();
+    const component = TestBed.createComponent(ComponentWithActionHandlers);
+    const action = new AsyncAction();
 
     component.destroy();
     Actions.dispatch(action);
@@ -297,8 +296,8 @@ describe('should unsubscribe on destroy of', () => {
     TestBed.configureTestingModule({
       declarations: [DirectiveWithActionHandlers, DirectiveContainer],
     }).compileComponents();
-    const component: ComponentFixture<DirectiveContainer> = TestBed.createComponent(DirectiveContainer);
-    const action: AsyncAction = new AsyncAction();
+    const component = TestBed.createComponent(DirectiveContainer);
+    const action = new AsyncAction();
 
     component.destroy();
     Actions.dispatch(action);
@@ -311,8 +310,8 @@ describe('should unsubscribe on destroy of', () => {
     TestBed.configureTestingModule({
       declarations: [ServiceContainer],
     }).compileComponents();
-    const component: ComponentFixture<ServiceContainer> = TestBed.createComponent(ServiceContainer);
-    const action: AsyncAction = new AsyncAction();
+    const component = TestBed.createComponent(ServiceContainer);
+    const action = new AsyncAction();
 
     component.destroy();
     Actions.dispatch(action);
@@ -329,7 +328,7 @@ describe('should override parent action handler with the same name -', () => {
       declarations: [ComponentWithActionHandlers],
     }).compileComponents();
     TestBed.createComponent(ComponentWithActionHandlers);
-    const action: AsyncAction = new AsyncAction();
+    const action = new AsyncAction();
 
     Actions.dispatch(action);
 
@@ -345,7 +344,7 @@ describe('should override parent action handler with the same name -', () => {
       declarations: [DirectiveWithActionHandlers, DirectiveContainer],
     }).compileComponents();
     TestBed.createComponent(DirectiveContainer);
-    const action: AsyncAction = new AsyncAction();
+    const action = new AsyncAction();
 
     Actions.dispatch(action);
 
@@ -361,7 +360,7 @@ describe('should override parent action handler with the same name -', () => {
       declarations: [ServiceContainer],
     }).compileComponents();
     TestBed.createComponent(ServiceContainer);
-    const action: AsyncAction = new AsyncAction();
+    const action = new AsyncAction();
 
     Actions.dispatch(action);
 

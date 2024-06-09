@@ -1,7 +1,7 @@
 import { Inject, InjectionToken, Injector, ModuleWithProviders, NgModule, Provider } from '@angular/core';
 
-const SERVICES: InjectionToken<Provider[]> = new InjectionToken<Provider[]>('SERVICES');
-const INJECTED_SERVICES: InjectionToken<Provider[][]> = new InjectionToken<Provider[][]>('INJECTED_SERVICES');
+const SERVICES = new InjectionToken<Provider[]>('SERVICES');
+const INJECTED_SERVICES = new InjectionToken<Provider[][]>('INJECTED_SERVICES');
 
 @NgModule()
 export class ActionsModule {
