@@ -5,18 +5,16 @@
     "ng": "ng",
     "build:ngx-action": "ng build ngx-action",
     "test": "ng test --code-coverage",
-    "lint": "ng lint"
+    "test:once": "ng test --watch=false",
+    "lint": "ng lint",
+    "prepare": "husky"
   },
   "private": true,
   "dependencies": {
-    "@angular/animations": "~13.0.0-next.0",
-    "@angular/common": "~13.0.0-next.0",
     "@angular/compiler": "~13.0.0-next.0",
     "@angular/core": "~13.0.0-next.0",
-    "@angular/forms": "~13.0.0-next.0",
     "@angular/platform-browser": "~13.0.0-next.0",
     "@angular/platform-browser-dynamic": "~13.0.0-next.0",
-    "@angular/router": "~13.0.0-next.0",
     "rxjs": "~7.4.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.11.4"
@@ -35,6 +33,7 @@
     "@typescript-eslint/eslint-plugin": "5.27.1",
     "@typescript-eslint/parser": "5.27.1",
     "eslint": "^8.17.0",
+    "husky": "^9.0.11",
     "jasmine-core": "~3.10.0",
     "karma": "~6.3.0",
     "karma-chrome-launcher": "~3.1.0",
