@@ -1,3 +1,6 @@
+[![npm downloads total](https://img.shields.io/npm/dt/ngx-action.svg?style=flat-square)](https://www.npmjs.com/package/ngx-action)
+[![npm downloads monthly](https://img.shields.io/npm/dm/ngx-action.svg?style=flat-square)](https://www.npmjs.com/package/ngx-action)
+
 # Description
 
 Lightweight (around 1KB gzipped) library allowing to
