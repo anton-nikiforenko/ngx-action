@@ -1,5 +1,5 @@
-import { of, throwError }  from 'rxjs';
-import { Actions }         from '../actions';
+import { of, throwError } from 'rxjs';
+import { Actions } from '../actions';
 import { dispatchOnError } from './dispatch-on-error';
 
 class ErrorAction {}

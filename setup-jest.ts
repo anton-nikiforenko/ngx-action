@@ -1,5 +1,5 @@
-import "jest-preset-angular/setup-jest";
+import 'jest-preset-angular/setup-jest';
 
 afterEach(() => {
-    jest.clearAllMocks();
+  jest.clearAllMocks();
 });
