@@ -1,12 +1,12 @@
-import { Component, Directive, Pipe, PipeTransform } from '@angular/core';
-import { TestBed }                                   from '@angular/core/testing';
-import { initActionHandlers }                        from './init-action-handlers';
-import { WithActionHandlers }                        from './with-action-handlers';
+import { Component, Directive, OnInit, Pipe, PipeTransform } from '@angular/core';
+import { TestBed }                                           from '@angular/core/testing';
+import { ActionHandler }                                     from './action-handler';
+import { initActionHandlers }                                from './init-action-handlers';
 
 it('should throw an error when used inside incorrect class', () => {
   expect(() => {
     @Pipe({name: 'testPipe'})
-    class PipeWithActionHandlers implements PipeTransform {
+    class TestPipe implements PipeTransform {
       constructor() {
         initActionHandlers(this);
       }
@@ -20,33 +20,16 @@ it('should throw an error when used inside incorrect class', () => {
     class TestComponent {}
 
     TestBed.configureTestingModule({
-      declarations: [PipeWithActionHandlers, TestComponent],
+      declarations: [TestPipe, TestComponent],
     }).compileComponents();
     TestBed.createComponent(TestComponent);
   }).toThrow(new Error('initActionHandlers(this) should be used inside class decorated with @Component(), @Directive(), or @Injectable().'));
 });
 
-it('should throw an error when used without decorator', () => {
-  expect(() => {
-    @Component({selector: 'component', template: ''})
-    class ComponentWithActionHandlers {
-      constructor() {
-        initActionHandlers(this);
-      }
-    }
-
-    TestBed.configureTestingModule({
-      declarations: [ComponentWithActionHandlers],
-    }).compileComponents();
-    TestBed.createComponent(ComponentWithActionHandlers);
-  }).toThrow(new Error('initActionHandlers(this) should be used inside class decorated with @WithActionHandlers().'));
-});
-
 it('should throw an error when called twice', () => {
   expect(() => {
-    @WithActionHandlers()
     @Component({selector: 'component', template: ''})
-    class ComponentWithActionHandlers {
+    class TestComponent {
       constructor() {
         initActionHandlers(this);
         initActionHandlers(this);
@@ -54,24 +37,23 @@ it('should throw an error when called twice', () => {
     }
 
     TestBed.configureTestingModule({
-      declarations: [ComponentWithActionHandlers],
+      declarations: [TestComponent],
     }).compileComponents();
-    TestBed.createComponent(ComponentWithActionHandlers);
+    TestBed.createComponent(TestComponent);
   }).toThrow(new Error('Method initActionHandlers(this) should be called only once - inside the deepest child class.'));
 });
 
 it('should throw an error when called inside both parent and child class', () => {
   expect(() => {
     @Directive()
-    class ParentComponentWithActionHandlers {
+    class ParentComponent {
       constructor() {
         initActionHandlers(this);
       }
     }
 
-    @WithActionHandlers()
     @Component({selector: 'component', template: ''})
-    class ComponentWithActionHandlers extends ParentComponentWithActionHandlers {
+    class ChildComponent extends ParentComponent {
       constructor() {
         super();
         initActionHandlers(this);
@@ -79,8 +61,31 @@ it('should throw an error when called inside both parent and child class', () =>
     }
 
     TestBed.configureTestingModule({
-      declarations: [ComponentWithActionHandlers],
+      declarations: [ChildComponent],
     }).compileComponents();
-    TestBed.createComponent(ComponentWithActionHandlers);
+    TestBed.createComponent(ChildComponent);
   }).toThrow(new Error('Method initActionHandlers(this) should be called only once - inside the deepest child class.'));
+});
+
+it('should throw an error when called outside of constructor', () => {
+  expect(() => {
+    class Action{}
+
+    @Component({selector: 'component', template: ''})
+    class TestComponent implements OnInit {
+      ngOnInit(): void {
+        initActionHandlers(this);
+      }
+
+      @ActionHandler(Action)
+      actionHandler(): void {}
+    }
+
+    TestBed.configureTestingModule({
+      declarations: [TestComponent],
+    }).compileComponents();
+
+    const component = TestBed.createComponent(TestComponent);
+    component.detectChanges();
+  }).toThrow(new Error('initActionHandlers(this) should be called inside constructor'));
 });
