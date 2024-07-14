@@ -1,9 +1,9 @@
 import { Component, Directive, Injectable } from '@angular/core';
-import { TestBed }                          from '@angular/core/testing';
-import { Observable, tap }                  from 'rxjs';
-import { Actions }                          from './actions';
-import { AsyncActionHandler }               from './async-action-handler';
-import { initActionHandlers }               from './init-action-handlers';
+import { TestBed } from '@angular/core/testing';
+import { Observable, tap } from 'rxjs';
+import { Actions } from './actions';
+import { AsyncActionHandler } from './async-action-handler';
+import { initActionHandlers } from './init-action-handlers';
 
 const componentActionHandlerSpy = jest.fn();
 const componentMultipleActionHandlerSpy = jest.fn();
@@ -24,10 +24,12 @@ class AsyncAction {}
 class AsyncAction2 {}
 
 // ---------- Component ----------
-@Component({selector: 'any', template: ''})
+@Component({ selector: 'any', template: '' })
 class ParentComponent {
   @AsyncActionHandler(AsyncAction)
-  public overwrittenActionHandler(handle$: Observable<AsyncAction>): Observable<unknown> {
+  public overwrittenActionHandler(
+    handle$: Observable<AsyncAction>,
+  ): Observable<unknown> {
     return handle$.pipe(
       tap((action: AsyncAction) => {
         componentParentOverwrittenActionHandlerSpy(action);
@@ -36,7 +38,7 @@ class ParentComponent {
   }
 }
 
-@Component({selector: 'selector', template: ''})
+@Component({ selector: 'selector', template: '' })
 class ChildComponent extends ParentComponent {
   constructor() {
     super();
@@ -44,7 +46,9 @@ class ChildComponent extends ParentComponent {
   }
 
   @AsyncActionHandler(AsyncAction)
-  public syncActionHandler(handle$: Observable<AsyncAction>): Observable<unknown> {
+  public syncActionHandler(
+    handle$: Observable<AsyncAction>,
+  ): Observable<unknown> {
     return handle$.pipe(
       tap((action: AsyncAction) => {
         componentActionHandlerSpy(action);
@@ -53,7 +57,9 @@ class ChildComponent extends ParentComponent {
   }
 
   @AsyncActionHandler(AsyncAction, AsyncAction2)
-  public multipleActionHandler(handle$: Observable<AsyncAction | AsyncAction2>): Observable<unknown> {
+  public multipleActionHandler(
+    handle$: Observable<AsyncAction | AsyncAction2>,
+  ): Observable<unknown> {
     return handle$.pipe(
       tap((action: AsyncAction | AsyncAction2) => {
         componentMultipleActionHandlerSpy(action);
@@ -62,7 +68,9 @@ class ChildComponent extends ParentComponent {
   }
 
   @AsyncActionHandler(AsyncAction)
-  public override overwrittenActionHandler(handle$: Observable<AsyncAction>): Observable<unknown> {
+  public override overwrittenActionHandler(
+    handle$: Observable<AsyncAction>,
+  ): Observable<unknown> {
     return handle$.pipe(
       tap((action: AsyncAction) => {
         componentChildOverwrittenActionHandlerSpy(action);
@@ -75,7 +83,9 @@ class ChildComponent extends ParentComponent {
 @Directive()
 class ParentDirective {
   @AsyncActionHandler(AsyncAction)
-  public overwrittenActionHandler(handle$: Observable<AsyncAction>): Observable<unknown> {
+  public overwrittenActionHandler(
+    handle$: Observable<AsyncAction>,
+  ): Observable<unknown> {
     return handle$.pipe(
       tap((action: AsyncAction) => {
         directiveParentOverwrittenActionHandlerSpy(action);
@@ -84,7 +94,7 @@ class ParentDirective {
   }
 }
 
-@Directive({selector: '[directive]'})
+@Directive({ selector: '[directive]' })
 class ChildDirective extends ParentDirective {
   constructor() {
     super();
@@ -92,7 +102,9 @@ class ChildDirective extends ParentDirective {
   }
 
   @AsyncActionHandler(AsyncAction)
-  public syncActionHandler(handle$: Observable<AsyncAction>): Observable<unknown> {
+  public syncActionHandler(
+    handle$: Observable<AsyncAction>,
+  ): Observable<unknown> {
     return handle$.pipe(
       tap((action: AsyncAction) => {
         directiveActionHandlerSpy(action);
@@ -101,7 +113,9 @@ class ChildDirective extends ParentDirective {
   }
 
   @AsyncActionHandler(AsyncAction, AsyncAction2)
-  public multipleActionHandler(handle$: Observable<AsyncAction | AsyncAction2>): Observable<unknown> {
+  public multipleActionHandler(
+    handle$: Observable<AsyncAction | AsyncAction2>,
+  ): Observable<unknown> {
     return handle$.pipe(
       tap((action: AsyncAction | AsyncAction2) => {
         directiveMultipleActionHandlerSpy(action);
@@ -110,7 +124,9 @@ class ChildDirective extends ParentDirective {
   }
 
   @AsyncActionHandler(AsyncAction)
-  public override overwrittenActionHandler(handle$: Observable<AsyncAction>): Observable<unknown> {
+  public override overwrittenActionHandler(
+    handle$: Observable<AsyncAction>,
+  ): Observable<unknown> {
     return handle$.pipe(
       tap((action: AsyncAction) => {
         directiveChildOverwrittenActionHandlerSpy(action);
@@ -119,13 +135,18 @@ class ChildDirective extends ParentDirective {
   }
 }
 
-@Component({selector: 'directive-container', template: '<div directive></div>'})
+@Component({
+  selector: 'directive-container',
+  template: '<div directive></div>',
+})
 export class DirectiveContainer {}
 
 // ---------- Service ----------
 class ParentService {
   @AsyncActionHandler(AsyncAction)
-  public overwrittenActionHandler(handle$: Observable<AsyncAction>): Observable<unknown> {
+  public overwrittenActionHandler(
+    handle$: Observable<AsyncAction>,
+  ): Observable<unknown> {
     return handle$.pipe(
       tap((action: AsyncAction) => {
         serviceParentOverwrittenActionHandlerSpy(action);
@@ -142,7 +163,9 @@ class ChildService extends ParentService {
   }
 
   @AsyncActionHandler(AsyncAction)
-  public syncActionHandler(handle$: Observable<AsyncAction>): Observable<unknown> {
+  public syncActionHandler(
+    handle$: Observable<AsyncAction>,
+  ): Observable<unknown> {
     return handle$.pipe(
       tap((action: AsyncAction) => {
         serviceActionHandlerSpy(action);
@@ -151,7 +174,9 @@ class ChildService extends ParentService {
   }
 
   @AsyncActionHandler(AsyncAction, AsyncAction2)
-  public multipleActionHandler(handle$: Observable<AsyncAction | AsyncAction2>): Observable<unknown> {
+  public multipleActionHandler(
+    handle$: Observable<AsyncAction | AsyncAction2>,
+  ): Observable<unknown> {
     return handle$.pipe(
       tap((action: AsyncAction | AsyncAction2) => {
         serviceMultipleActionHandlerSpy(action);
@@ -160,7 +185,9 @@ class ChildService extends ParentService {
   }
 
   @AsyncActionHandler(AsyncAction)
-  public override overwrittenActionHandler(handle$: Observable<AsyncAction>): Observable<unknown> {
+  public override overwrittenActionHandler(
+    handle$: Observable<AsyncAction>,
+  ): Observable<unknown> {
     return handle$.pipe(
       tap((action: AsyncAction) => {
         serviceChildOverwrittenActionHandlerSpy(action);
@@ -169,10 +196,13 @@ class ChildService extends ParentService {
   }
 }
 
-@Component({selector: 'service-container', template: '', providers: [ChildService]})
+@Component({
+  selector: 'service-container',
+  template: '',
+  providers: [ChildService],
+})
 export class ServiceContainer {
-  constructor(public service: ChildService) {
-  }
+  constructor(public service: ChildService) {}
 }
 
 describe('should subscribe to action -', () => {
@@ -318,7 +348,9 @@ describe('should override parent action handler with the same name -', () => {
     Actions.dispatch(action);
 
     expect(componentParentOverwrittenActionHandlerSpy).toHaveBeenCalledTimes(0);
-    expect(componentChildOverwrittenActionHandlerSpy).toHaveBeenCalledWith(action);
+    expect(componentChildOverwrittenActionHandlerSpy).toHaveBeenCalledWith(
+      action,
+    );
     expect(componentChildOverwrittenActionHandlerSpy).toHaveBeenCalledTimes(1);
   });
 
@@ -332,7 +364,9 @@ describe('should override parent action handler with the same name -', () => {
     Actions.dispatch(action);
 
     expect(directiveParentOverwrittenActionHandlerSpy).toHaveBeenCalledTimes(0);
-    expect(directiveChildOverwrittenActionHandlerSpy).toHaveBeenCalledWith(action);
+    expect(directiveChildOverwrittenActionHandlerSpy).toHaveBeenCalledWith(
+      action,
+    );
     expect(directiveChildOverwrittenActionHandlerSpy).toHaveBeenCalledTimes(1);
   });
 
@@ -346,7 +380,9 @@ describe('should override parent action handler with the same name -', () => {
     Actions.dispatch(action);
 
     expect(serviceParentOverwrittenActionHandlerSpy).toHaveBeenCalledTimes(0);
-    expect(serviceChildOverwrittenActionHandlerSpy).toHaveBeenCalledWith(action);
+    expect(serviceChildOverwrittenActionHandlerSpy).toHaveBeenCalledWith(
+      action,
+    );
     expect(serviceChildOverwrittenActionHandlerSpy).toHaveBeenCalledTimes(1);
   });
 });

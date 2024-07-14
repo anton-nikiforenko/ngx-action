@@ -17,7 +17,7 @@ yarn add ngx-action
 # Compatibility
 
 | Library version      | @angular/core | rxjs        |
-|----------------------|---------------|-------------|
+| -------------------- | ------------- | ----------- |
 | \>=2.0.0             | \>=16         | \>=7 && < 8 |
 | \>=1.2.2             | \>=13         | \>=7 && < 8 |
 | \>=1.2.0 && <= 1.2.1 | \>=13 && <17  | \>=7 && < 8 |
@@ -48,13 +48,13 @@ class ShowErrorNotification extends LoggableAction {
 ### 2.1 `Actions.onAction()` method:
 
 ```ts
-import { Actions } from 'ngx-action';
+import { Actions } from "ngx-action";
 
-Actions.onAction(DetailsSuccess, ListSuccess).pipe(
-  takeUntilDestroyed()
-).subscribe((action: DetailsSuccess | ListSuccess) => {
-  console.log(action.payload);
-});
+Actions.onAction(DetailsSuccess, ListSuccess)
+  .pipe(takeUntilDestroyed())
+  .subscribe((action: DetailsSuccess | ListSuccess) => {
+    console.log(action.payload);
+  });
 ```
 
 ### 2.2 `@ActionHandler()` or `@AsyncActionHandler()` decorator:
@@ -92,10 +92,10 @@ export class MyComponent {
   successHandler(action: DetailsSuccess | ListSuccess): void {
     // update signal value
     payloadSignal.set(action.payload);
-    
+
     // update subject value
     this.payload$.next(action.payload);
-    
+
     // update plain value - may require change detection triggering
     this.payload = action.payload;
     this.cdr.markForCheck();
@@ -122,18 +122,19 @@ export class MyComponent {
   }
 }
 ```
+
 > Decorators use `takeUntilDestroyed()` operator under the hood and will unsubscribe on destroy
-(**all pending async actions, like http requests, will be cancelled**).
+> (**all pending async actions, like http requests, will be cancelled**).
 
 ## 3. Dispatch Actions
 
 ### 3.1 `Actions.dispatch()` method:
 
 ```ts
-import { Actions } from 'ngx-action';
+import { Actions } from "ngx-action";
 
 Actions.dispatch(new SignOut());
-Actions.dispatch(new DetailsSuccess('details'), new ListSuccess('list'));
+Actions.dispatch(new DetailsSuccess("details"), new ListSuccess("list"));
 ```
 
 ### 3.2 rxjs operators:
@@ -190,7 +191,7 @@ export class TreeShakeableService {
 ### 1.1 At NgModule level
 
 ```ts
-import { ActionsModule } from 'ngx-action';
+import { ActionsModule } from "ngx-action";
 
 @NgModule({
   providers: [
@@ -208,7 +209,7 @@ so inject them directly.
 
 ```ts
 @Component({
-providers: [TreeShakeableService], // <-- provide service
+  providers: [TreeShakeableService], // <-- provide service
 })
 export class FeatureComponent {
   constructor(
@@ -220,17 +221,18 @@ export class FeatureComponent {
 ### 1.3 When providing via route provider
 
 ```ts
-import { importProvidersFrom } from '@angular/core';
-import { ActionsModule } from 'ngx-action';
+import { importProvidersFrom } from "@angular/core";
+import { ActionsModule } from "ngx-action";
 
-export const routes: Routes = [{
-  path: '',
-  component: SomeComponent,
-  // use importProvidersFrom() with ActionsModule.provide() to prevent tree-shaking
-  providers: [importProvidersFrom(ActionsModule.provide([TreeShakeableService]))]
-}];
+export const routes: Routes = [
+  {
+    path: "",
+    component: SomeComponent,
+    // use importProvidersFrom() with ActionsModule.provide() to prevent tree-shaking
+    providers: [importProvidersFrom(ActionsModule.provide([TreeShakeableService]))],
+  },
+];
 ```
-
 
 ## 2. Inheritance
 
@@ -244,12 +246,12 @@ abstract class Parent {
   parentOne() {
     console.log('parent 1');
   }
-  
+
   @ActionHandler(Action)
   parentTwo() {
     console.log('parent 2');
   }
-  
+
   @ActionHandler(Action)
   parentThree() {
     console.log('parent 3');
@@ -261,7 +263,7 @@ class Child extends Parent {
   constructor() {
     super();
     initActionHandlers(this);
-    
+
     Actions.dispatch(new Action());
     // parent 3 // parent parentThree()
     // child 1 // child parentOne()
@@ -274,13 +276,13 @@ class Child extends Parent {
   parentOne() {
     console.log('child 1');
   }
-  
+
   @ActionHandler(Action)
   parentTwo() {
     super.parentTwo(); // super call
     console.log('child 2');
   }
-  
+
   @ActionHandler(Action)
   childThree() {
     console.log('child 3');

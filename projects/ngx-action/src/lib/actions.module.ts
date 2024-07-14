@@ -1,16 +1,22 @@
-import { Inject, InjectionToken, Injector, ModuleWithProviders, NgModule, Provider } from '@angular/core';
+import {
+  Inject,
+  InjectionToken,
+  Injector,
+  ModuleWithProviders,
+  NgModule,
+  Provider,
+} from '@angular/core';
 
 const SERVICES = new InjectionToken<Provider[]>('SERVICES');
 const INJECTED_SERVICES = new InjectionToken<Provider[][]>('INJECTED_SERVICES');
 
 @NgModule()
 export class ActionsModule {
-  constructor(
-    @Inject(INJECTED_SERVICES) injectedServices: Provider[][],
-  ) {
-  }
+  constructor(@Inject(INJECTED_SERVICES) injectedServices: Provider[][]) {}
 
-  public static provide(services: Provider[]): ModuleWithProviders<ActionsModule> {
+  public static provide(
+    services: Provider[],
+  ): ModuleWithProviders<ActionsModule> {
     return {
       ngModule: ActionsModule,
       providers: [
@@ -23,10 +29,7 @@ export class ActionsModule {
         {
           provide: INJECTED_SERVICES,
           multi: true,
-          deps: [
-            Injector,
-            SERVICES,
-          ],
+          deps: [Injector, SERVICES],
           useFactory: injectedServicesFactory,
         },
       ],
