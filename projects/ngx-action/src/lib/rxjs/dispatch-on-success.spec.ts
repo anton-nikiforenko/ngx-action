@@ -7,7 +7,7 @@ class SuccessAction2 {}
 
 it('should dispatch an action', () => {
   const source$ = of(1);
-  const spy = jasmine.createSpy();
+  const spy = jest.fn();
   Actions.onAction(SuccessAction).subscribe(spy);
   const action = new SuccessAction();
 
@@ -19,7 +19,7 @@ it('should dispatch an action', () => {
 
 it('should dispatch multiple actions', () => {
   const source$ = of(1);
-  const spy = jasmine.createSpy();
+  const spy = jest.fn();
   Actions.onAction(SuccessAction, SuccessAction2).subscribe(spy);
   const action = new SuccessAction();
   const action2 = new SuccessAction2();
@@ -33,7 +33,7 @@ it('should dispatch multiple actions', () => {
 
 it(`shouldn't dispatch an action on source error`, () => {
   const source$ = throwError(() => new Error('error'));
-  const spy = jasmine.createSpy();
+  const spy = jest.fn();
   Actions.onAction(SuccessAction).subscribe(spy);
   const action = new SuccessAction();
 

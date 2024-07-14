@@ -7,7 +7,7 @@ class ErrorAction2 {}
 
 it('should dispatch an action on source error', () => {
   const source$ = throwError(() => new Error('error'));
-  const spy = jasmine.createSpy();
+  const spy = jest.fn();
   Actions.onAction(ErrorAction).subscribe(spy);
   const action = new ErrorAction();
 
@@ -21,7 +21,7 @@ it('should dispatch an action on source error', () => {
 
 it('should dispatch multiple actions on source error', () => {
   const source$ = throwError(() => new Error('error'));
-  const spy = jasmine.createSpy();
+  const spy = jest.fn();
   Actions.onAction(ErrorAction, ErrorAction2).subscribe(spy);
   const action = new ErrorAction();
   const action2 = new ErrorAction2();
@@ -37,7 +37,7 @@ it('should dispatch multiple actions on source error', () => {
 
 it(`shouldn't rethrow source error`, () => {
   const source$ = throwError(() => new Error('error'));
-  const spy = jasmine.createSpy();
+  const spy = jest.fn();
 
   source$.pipe(dispatchOnError(() => new ErrorAction())).subscribe({
     error: spy,
@@ -48,7 +48,7 @@ it(`shouldn't rethrow source error`, () => {
 
 it(`shouldn't dispatch an action if source doesn't emit an error`, () => {
   const source$ = of(1);
-  const spy = jasmine.createSpy();
+  const spy = jest.fn();
   Actions.onAction(ErrorAction).subscribe(spy);
   const action = new ErrorAction();
 

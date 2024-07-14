@@ -4,20 +4,20 @@ import { ActionHandler }                    from './action-handler';
 import { Actions }                          from './actions';
 import { initActionHandlers }               from './init-action-handlers';
 
-const componentActionHandlerSpy = jasmine.createSpy();
-const componentMultipleActionHandlerSpy = jasmine.createSpy();
-const componentParentOverwrittenActionHandlerSpy = jasmine.createSpy();
-const componentChildOverwrittenActionHandlerSpy = jasmine.createSpy();
+const componentActionHandlerSpy = jest.fn();
+const componentMultipleActionHandlerSpy = jest.fn();
+const componentParentOverwrittenActionHandlerSpy = jest.fn();
+const componentChildOverwrittenActionHandlerSpy = jest.fn();
 
-const directiveActionHandlerSpy = jasmine.createSpy();
-const directiveMultipleActionHandlerSpy = jasmine.createSpy();
-const directiveParentOverwrittenActionHandlerSpy = jasmine.createSpy();
-const directiveChildOverwrittenActionHandlerSpy = jasmine.createSpy();
+const directiveActionHandlerSpy = jest.fn();
+const directiveMultipleActionHandlerSpy = jest.fn();
+const directiveParentOverwrittenActionHandlerSpy = jest.fn();
+const directiveChildOverwrittenActionHandlerSpy = jest.fn();
 
-const serviceActionHandlerSpy = jasmine.createSpy();
-const serviceMultipleActionHandlerSpy = jasmine.createSpy();
-const serviceParentOverwrittenActionHandlerSpy = jasmine.createSpy();
-const serviceChildOverwrittenActionHandlerSpy = jasmine.createSpy();
+const serviceActionHandlerSpy = jest.fn();
+const serviceMultipleActionHandlerSpy = jest.fn();
+const serviceParentOverwrittenActionHandlerSpy = jest.fn();
+const serviceChildOverwrittenActionHandlerSpy = jest.fn();
 
 class SyncAction {}
 class SyncAction2 {}
@@ -128,10 +128,9 @@ export class ServiceContainer {
 
 describe('should subscribe to action -', () => {
   it('component', () => {
-    componentActionHandlerSpy.calls.reset();
     TestBed.configureTestingModule({
       declarations: [ChildComponent],
-    }).compileComponents();
+    });
     TestBed.createComponent(ChildComponent);
     const action = new SyncAction();
 
@@ -142,10 +141,9 @@ describe('should subscribe to action -', () => {
   });
 
   it('directive', () => {
-    directiveActionHandlerSpy.calls.reset();
     TestBed.configureTestingModule({
       declarations: [ChildDirective, DirectiveContainer],
-    }).compileComponents();
+    });
     TestBed.createComponent(DirectiveContainer);
     const action = new SyncAction();
 
@@ -156,10 +154,9 @@ describe('should subscribe to action -', () => {
   });
 
   it('service', () => {
-    serviceActionHandlerSpy.calls.reset();
     TestBed.configureTestingModule({
       declarations: [ServiceContainer],
-    }).compileComponents();
+    });
     TestBed.createComponent(ServiceContainer);
     const action = new SyncAction();
 
@@ -172,10 +169,9 @@ describe('should subscribe to action -', () => {
 
 describe('should subscribe to multiple actions -', () => {
   it('component', () => {
-    componentMultipleActionHandlerSpy.calls.reset();
     TestBed.configureTestingModule({
       declarations: [ChildComponent],
-    }).compileComponents();
+    });
     TestBed.createComponent(ChildComponent);
     const action = new SyncAction();
     const action2 = new SyncAction2();
@@ -189,10 +185,9 @@ describe('should subscribe to multiple actions -', () => {
   });
 
   it('directive', () => {
-    directiveMultipleActionHandlerSpy.calls.reset();
     TestBed.configureTestingModule({
       declarations: [ChildDirective, DirectiveContainer],
-    }).compileComponents();
+    });
     TestBed.createComponent(DirectiveContainer);
     const action = new SyncAction();
     const action2 = new SyncAction2();
@@ -206,10 +201,9 @@ describe('should subscribe to multiple actions -', () => {
   });
 
   it('service', () => {
-    serviceMultipleActionHandlerSpy.calls.reset();
     TestBed.configureTestingModule({
       declarations: [ServiceContainer],
-    }).compileComponents();
+    });
     TestBed.createComponent(ServiceContainer);
     const action = new SyncAction();
     const action2 = new SyncAction2();
@@ -225,10 +219,9 @@ describe('should subscribe to multiple actions -', () => {
 
 describe('should unsubscribe on destroy of', () => {
   it('component', () => {
-    componentActionHandlerSpy.calls.reset();
     TestBed.configureTestingModule({
       declarations: [ChildComponent],
-    }).compileComponents();
+    });
     const component = TestBed.createComponent(ChildComponent);
     const action = new SyncAction();
 
@@ -239,10 +232,9 @@ describe('should unsubscribe on destroy of', () => {
   });
 
   it('directive', () => {
-    directiveActionHandlerSpy.calls.reset();
     TestBed.configureTestingModule({
       declarations: [ChildDirective, DirectiveContainer],
-    }).compileComponents();
+    });
     const component = TestBed.createComponent(DirectiveContainer);
     const action = new SyncAction();
 
@@ -253,10 +245,9 @@ describe('should unsubscribe on destroy of', () => {
   });
 
   it('service', () => {
-    serviceActionHandlerSpy.calls.reset();
     TestBed.configureTestingModule({
       declarations: [ServiceContainer],
-    }).compileComponents();
+    });
     const component = TestBed.createComponent(ServiceContainer);
     const action = new SyncAction();
 
@@ -269,11 +260,9 @@ describe('should unsubscribe on destroy of', () => {
 
 describe('should override parent action handler with the same name -', () => {
   it('component', () => {
-    componentParentOverwrittenActionHandlerSpy.calls.reset();
-    componentChildOverwrittenActionHandlerSpy.calls.reset();
     TestBed.configureTestingModule({
       declarations: [ChildComponent],
-    }).compileComponents();
+    });
     TestBed.createComponent(ChildComponent);
     const action = new SyncAction();
 
@@ -285,11 +274,9 @@ describe('should override parent action handler with the same name -', () => {
   });
 
   it('directive', () => {
-    directiveParentOverwrittenActionHandlerSpy.calls.reset();
-    directiveChildOverwrittenActionHandlerSpy.calls.reset();
     TestBed.configureTestingModule({
       declarations: [ChildDirective, DirectiveContainer],
-    }).compileComponents();
+    });
     TestBed.createComponent(DirectiveContainer);
     const action = new SyncAction();
 
@@ -301,11 +288,9 @@ describe('should override parent action handler with the same name -', () => {
   });
 
   it('service', () => {
-    serviceParentOverwrittenActionHandlerSpy.calls.reset();
-    serviceChildOverwrittenActionHandlerSpy.calls.reset();
     TestBed.configureTestingModule({
       declarations: [ServiceContainer],
-    }).compileComponents();
+    });
     TestBed.createComponent(ServiceContainer);
     const action = new SyncAction();
 
