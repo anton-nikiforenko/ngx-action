@@ -21,7 +21,7 @@ it('should throw an error when used inside incorrect class', () => {
 
     TestBed.configureTestingModule({
       declarations: [TestPipe, TestComponent],
-    }).compileComponents();
+    });
     TestBed.createComponent(TestComponent);
   }).toThrow(new Error('initActionHandlers(this) should be used inside class decorated with @Component(), @Directive(), or @Injectable().'));
 });
@@ -38,7 +38,7 @@ it('should throw an error when called twice', () => {
 
     TestBed.configureTestingModule({
       declarations: [TestComponent],
-    }).compileComponents();
+    });
     TestBed.createComponent(TestComponent);
   }).toThrow(new Error('Method initActionHandlers(this) should be called only once - inside the deepest child class.'));
 });
@@ -62,7 +62,7 @@ it('should throw an error when called inside both parent and child class', () =>
 
     TestBed.configureTestingModule({
       declarations: [ChildComponent],
-    }).compileComponents();
+    });
     TestBed.createComponent(ChildComponent);
   }).toThrow(new Error('Method initActionHandlers(this) should be called only once - inside the deepest child class.'));
 });
@@ -83,7 +83,7 @@ it('should throw an error when called outside of constructor', () => {
 
     TestBed.configureTestingModule({
       declarations: [TestComponent],
-    }).compileComponents();
+    });
 
     const component = TestBed.createComponent(TestComponent);
     component.detectChanges();

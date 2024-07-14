@@ -5,7 +5,7 @@ class SecondAction {}
 class ThirdAction {}
 
 it('should dispatch action', () => {
-  const spy = jasmine.createSpy();
+  const spy = jest.fn();
   const action = new FirstAction();
   Actions.onAction(FirstAction).subscribe(spy);
 
@@ -16,7 +16,7 @@ it('should dispatch action', () => {
 });
 
 it('should dispatch multiple actions', () => {
-  const spy = jasmine.createSpy();
+  const spy = jest.fn();
   const action = new FirstAction();
   const action2 = new FirstAction();
   Actions.onAction(FirstAction).subscribe(spy);
@@ -29,7 +29,7 @@ it('should dispatch multiple actions', () => {
 });
 
 it('should subscribe to specific action', () => {
-  const spy = jasmine.createSpy();
+  const spy = jest.fn();
   const firstAction = new FirstAction();
   const secondAction = new SecondAction();
   Actions.onAction(FirstAction).subscribe(spy);
@@ -43,7 +43,7 @@ it('should subscribe to specific action', () => {
 });
 
 it('should subscribe to multiple actions', () => {
-  const spy = jasmine.createSpy();
+  const spy = jest.fn();
   const firstAction = new FirstAction();
   const secondAction = new SecondAction();
   const thirdAction = new ThirdAction();
