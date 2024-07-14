@@ -1,6 +1,6 @@
-import { Observable, of, throwError } from 'rxjs';
-import { Actions }                    from '../actions';
-import { dispatchOnSuccess }          from './dispatch-on-success';
+import { of, throwError }    from 'rxjs';
+import { Actions }           from '../actions';
+import { dispatchOnSuccess } from './dispatch-on-success';
 
 class SuccessAction {}
 class SuccessAction2 {}

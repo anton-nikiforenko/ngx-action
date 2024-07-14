@@ -4,15 +4,7 @@
 # Description
 
 Lightweight (around 1KB gzipped) library allowing to
-sync components of Angular application using actions and decorators.
-
-# Features
-
-- All actions are classes
-- Dispatch one or more actions at once using service
-- Dispatch one or more actions using rxjs operators
-- Subscribe to one or more actions using service
-- Subscribe to one or more actions inside Component, Directive, or Injectable with decorators
+sync components, directives and services of Angular application.
 
 # Installation
 
@@ -24,145 +16,105 @@ yarn add ngx-action
 
 # Compatibility
 
-| Library version      | @angular/core | rxjs          |
-|----------------------|---------------|---------------|
-| \>=1.2.2             | \>=13         | \>=7 && < 8   |
-| \>=1.2.0 && <= 1.2.1 | \>=13 && <17  | \>=7 && < 8   |
-| \<1.2.0              | \>=13 && <16  | \>=7 && < 8   |
+| Library version      | @angular/core | rxjs        |
+|----------------------|---------------|-------------|
+| \>=2.0.0             | \>=16         | \>=7 && < 8 |
+| \>=1.2.2             | \>=13         | \>=7 && < 8 |
+| \>=1.2.0 && <= 1.2.1 | \>=13 && <17  | \>=7 && < 8 |
+| \<1.2.0              | \>=13 && <16  | \>=7 && < 8 |
 
-# API
+# Usage
 
-## Action examples
+## 1. Create actions
 
-Action must be a class, as the library uses the `instanceof` operator
-to distinguish between actions.
-
-```ts
-class EmptyAction {}
-
-class ActionWithPayload {
-  constructor(
-    public data: any,
-    public anotherData: any,
-    // ...
-  ) {
-  }
-}
-
-abstract class AbstractAction {}
-```
-
-## Dispatch Actions
-
-Dispatch one or more actions with `Actions.dispatch(action1, ..., actionN)`.
+> Action must be a class, as the library uses the `instanceof` operator under the hood.
 
 ```ts
-import { Actions } from 'ngx-action';
-
-class SomeAction {
+class SignOut {}
+class DetailsSuccess {
   constructor(public payload: any) {}
 }
-
-// ...
-Actions.dispatch(new SomeAction('payload'));
-
-// dispatch many actions at once
-Actions.dispatch(new SomeAction('v1'), new SomeAction('v2'));
+class ListSuccess {
+  constructor(public payload: any) {}
+}
+abstract class LoggableAction {}
+class ShowErrorNotification extends LoggableAction {
+  constructor(public text: string) {}
+}
 ```
 
-## Subscribe to Actions using service
+## 2. Subscribe to actions
 
-Subscribe to one or more actions with `Actions.onAction(ActionClass1, ..., ActionClassN)`.
+### 2.1 `Actions.onAction()` method:
 
 ```ts
 import { Actions } from 'ngx-action';
 
-// subscribe to single action and do sync stuff
-Actions.onAction(SomeAction).subscribe( // don't forget to unsubscribe
-  (action: SomeAction) => {
-    // do something
-  },
-);
-
-// subscribe to multiple actions and do sync stuff
-Actions.onAction(SomeAction, AnotherAction).subscribe( // don't forget to unsubscribe
-  (action: SomeAction | AnotherAction) => {
-    // do something
-  },
-);
-
-// subscribe to single action and do async stuff
-Actions.onAction(SomeAction).pipe(
-  mergeMap((action: SomeAction) => doSomethingAsync(someAction.payload))
-).subscribe( // don't forget to unsubscribe
-  (result) => {
-    // do something with result
-  },
-);
+Actions.onAction(DetailsSuccess, ListSuccess).pipe(
+  takeUntilDestroyed()
+).subscribe((action: DetailsSuccess | ListSuccess) => {
+  console.log(action.payload);
+});
 ```
 
-## Subscribe to Actions using Decorators
-
-Subscribe to one or more actions with `@ActionHandler(ActionClass1, ..., ActionClassN)`
-or `@AsyncActionHandler(ActionClass1, ..., ActionClassN)`.
-
-1. Apply `@WithActionHandlers()` class decorator to Component, Directive,
-or Service (Injectable).
-Unsubscription logic will be added at this point (by patching `ngOnDestroy` hook).
-   1. If you have hierarchy of classes (e.g. `ChildComponent`, `ParentComponent`, `GrandParentComponent`),
-   **decorator should be applied only once to the deepest child** (`ChildComponent`).
-   1. Library will throw an error in case you'll apply decorator twice, or apply it to both parent and child.
-1. Call `initActionHandlers(this)` helper method once inside the constructor
-(may also be called inside `ngOnInit` or other method, but not recommended).
-At this point subscriptions will be created.
-   1. This method should also be called in the deepest child.
-   1. Error will be thrown in case you call this method twice, or forget to apply class decorator.
-   1. Error will be thrown in case you apply class decorator, but forget to call the method.
-1. Configure action subscriptions using `@ActionHandler(Action)` and `@AsyncActionHandler(Action)`
-method decorators.
-   1. If you have decorated method with the same name in the parent and child classes,
-   subscription will be created for one described in the child class.
+### 2.2 `@ActionHandler()` or `@AsyncActionHandler()` decorator:
 
 ```ts
-import {
-  ActionHandler,
-  AsyncActionHandler,
-  initActionHandlers,
-  WithActionHandlers
-} from 'ngx-action';
-import { EMPTY } from 'rxjs';
+import { signal } from "@angular/core";
+import { BehaviorSubject, EMPTY } from 'rxjs';
+import { ActionHandler, AsyncActionHandler, initActionHandlers } from 'ngx-action';
 
-@WithActionHandlers() // <-- 1. apply class decorator
-@Component(...)
-export class SomeComponent {
+@Component(...) // or @Directive(...), or @Injectable()
+export class MyComponent {
+  payloadSignal = signal<any>(null);
+  payload$ = new BehaviorSubject<any>(null);
+  payload = null;
+
   constructor(
-    private apiService: ApiService,
+    private httpClient: HttpClient,
+    private cdr: ChangeDetectorRef,
+    private notifications: Notifications,
   ) {
-    initActionHandlers(this); // <-- 2. call helper method
+    initActionHandlers(this); // <-- !!! call helper method to activate subscriptions
   }
 
-  @ActionHandler(SyncAction) // 3. <-- use decorator to subscribe to action
-  syncActionHandler(action: SyncAction): void { // "action" argument is optional
-    // do something synchronously
-    // don't forget to handle errors
-    // or action handler will be stopped after the first one occurs
+  @ActionHandler(ShowErrorNotification) // handle action synchronously
+  showErrorNotificationHandler(action: ShowErrorNotification): void {
+    this.notifications.error(action.text);
   }
 
-  @ActionHandler(SyncAction, SyncAction2) // 3.
-  syncActionHandler(action: SyncAction | SyncAction2): void {
-    // do something synchronously
+  @ActionHandler(LoggableAction) // handle abstract action
+  loggableActionHandler(action: LoggableAction): void {
+    console.log(action);
   }
 
-  @AsyncActionHandler(AsyncAction) // 3.
-  asyncActionHandler(handle$: Observable<AsyncAction>): Observable<any> {
+  @ActionHandler(DetailsSuccess, ListSuccess) // handle multiple actions
+  successHandler(action: DetailsSuccess | ListSuccess): void {
+    // update signal value
+    payloadSignal.set(action.payload);
+    
+    // update subject value
+    this.payload$.next(action.payload);
+    
+    // update plain value - may require change detection triggering
+    this.payload = action.payload;
+    this.cdr.markForCheck();
+  }
+
+  @AsyncActionHandler(SignOut) // handle action asynchronously
+  signOutHandler(handle$: Observable<SignOut>): Observable<unknown> {
     return handle$.pipe(
-      mergeMap((action: AsyncAction) => {
-        return this.apiService.doSmth(action.payload).pipe(
+      mergeMap((action: SignOut) => {
+        return this.httpClient.post('/sign-out').pipe(
+          // optionally handle result
+          tap((response) => {
+            console.log(response);
+          }),
           // don't forget to handle errors,
           // or action handler will be stopped after the first one occurs
-          catchError((error) => EMPTY),
-          tap((result) => {
-            // do something with result
+          catchError((error) => {
+            console.error(error);
+            return EMPTY;
           }),
         );
       })
@@ -170,237 +122,168 @@ export class SomeComponent {
   }
 }
 ```
-
-#### Action handlers lifetime
-
-The library patches `ngOnDestroy` hook under the hood.
-That's why active action handlers, **subscribed using decorators**,
-will unsubscribe on component, directive, or service destroy
+> Decorators use `takeUntilDestroyed()` operator under the hood and will unsubscribe on destroy
 (**all pending async actions, like http requests, will be cancelled**).
 
-## Internal types
+## 3. Dispatch Actions
 
-Library exports `ActionClass` (parameter of ActionHandler decorator) type,
-that may sometimes help with generic types. Example below:
+### 3.1 `Actions.dispatch()` method:
 
 ```ts
-import { ActionClass } from 'ngx-action';
+import { Actions } from 'ngx-action';
 
-class ParentClass<T extends ActionClass> {
-  constructor(Class: T) {
-    Actions.onAction(Class).subscribe(
-      () => {
-        // do something common
-      }
-    );
-  }
-}
-
-class ChildAction {}
-
-class ChildClass entends ParentClass<typeof SpecificAction> {
-  constructor() {
-    super(ChildAction);
-  }
-
-  // do something child-specific
-}
+Actions.dispatch(new SignOut());
+Actions.dispatch(new DetailsSuccess('details'), new ListSuccess('list'));
 ```
 
-## Prevent services tree-shaking
+### 3.2 rxjs operators:
 
-If you extract some action handlers into services,
-and don't inject those services anywhere in the app,
-Angular compiler will remove them from the bundle.
-Provide such services using `ActionsModule` to avoid this,
-or directly inject services when above technique not applicable.
-
-#### Tree-shakeable service
+**dispatchOnSuccess** - dispatch actions when source observable emits.
 
 ```ts
-import {
-  ActionHandler,
-  AsyncActionHandler,
-  initActionHandlers,
-  WithActionHandlers
-} from 'ngx-action';
+Actions.onAction(Action).pipe(
+  mergeMap((action: Action) => this.httpCLient.get(...).pipe(
+    dispatchOnSuccess((result) => new ActionSuccess(result.data)),
+    // dispatchOnSuccess((result) => [new ActionSuccess(result.data), new ActionSuccess()]),
+  )),
+  takeUntilDestroyed(),
+).subscribe();
+```
 
-@WithActionHandlers()
+**dispatchOnError** - dispatch actions when source observable throws an error.
+It won't rethrow the error, so use `catchError` instead if you want to add custom error handling.
+
+```ts
+Actions.onAction(Action).pipe(
+  mergeMap((action: Action) => this.httpCLient.get(...).pipe(
+    dispatchOnError((error: unknown) => new LogError(error)),
+    // dispatchOnError((result) => [new LogError(error), new LogError(error)]),
+  )),
+  takeUntilDestroyed(),
+).subscribe();
+```
+
+# Techniques
+
+## 1. Prevent services tree-shaking
+
+> If you extract some action handlers into services,
+> and don't inject those services anywhere in the app,
+> Angular compiler will remove them from the bundle.
+> Provide such services using `ActionsModule` to avoid this,
+> or directly inject services when above technique not applicable.
+
+```ts
+import { ActionHandler, AsyncActionHandler, initActionHandlers } from 'ngx-action';
+
 @Injectable()
-export class FeatureActionHandlers { // <-- tree-shakeable service
+export class TreeShakeableService {
   constructor() {
       initActionHandlers(this);
   }
 
   @ActionHandler(...)
   // ...
-
-  @AsyncActionHandler(...)
-  // ...
 }
 ```
 
-### Prevent tree-shaking at NgModule level
+### 1.1 At NgModule level
 
 ```ts
 import { ActionsModule } from 'ngx-action';
 
 @NgModule({
   providers: [
-    // prevent service tree-shaking
-    ActionsModule.provide([FeatureActionHandlers]),
+    // use ActionsModule.provide() to prevent tree-shaking
+    ActionsModule.provide([TreeShakeableService]),
   ],
 })
 export class FeatureModule {}
 ```
 
-### Prevent tree-shaking at Component level
+### 1.2 At Component level
 
 `ActionsModule` not applicable here (neither with standard nor with standalone components),
 so inject them directly.
 
 ```ts
 @Component({
-  providers: [FeatureActionHandlersService], // <-- provide service
+providers: [TreeShakeableService], // <-- provide service
 })
 export class FeatureComponent {
   constructor(
-    public service: FeatureActionHandlers, // <-- inject service by yourself
+    public service: TreeShakeableService, // <-- inject service to prevent tree-shaking
   ) {}
 }
 ```
 
-### Prevent Route providers tree-shaking (Angular 14+)
-
-You can use Angular `importProvidersFrom` helper with `ActionsModule`
-to prevent Route providers tree-shaking.
+### 1.3 When providing via route provider
 
 ```ts
 import { importProvidersFrom } from '@angular/core';
 import { ActionsModule } from 'ngx-action';
 
-export const routes: Routes = [
-    {
-        path: '',
-        component: SomeComponent,
-        // prevent service tree-shaking
-        providers: [importProvidersFrom(ActionsModule.provide([FeatureActionHandlers]))]
-    },
-];
+export const routes: Routes = [{
+  path: '',
+  component: SomeComponent,
+  // use importProvidersFrom() with ActionsModule.provide() to prevent tree-shaking
+  providers: [importProvidersFrom(ActionsModule.provide([TreeShakeableService]))]
+}];
 ```
 
-## rxjs operators
 
-Here are some useful rxjs operators exported by the library.
-Should typically be used when doing async stuff, like http requests.
+## 2. Inheritance
 
-### dispatchOnSuccess
-
-Dispatch one or more actions when source emits a value.
+> Action handlers inheritance works similar to native inheritance:
+> child methods will override parent methods with the same name (but you can call them using `super`).
 
 ```ts
-Actions.onAction(SomeAction).pipe(
-  mergeMap((action: SomeAction) => doSomethingAsync(someAction.payload).pipe(
-    dispatchOnSuccess((result) => new SuccessAction(result.data)),
-    // dispatchOnSuccess((result) => [new SuccessAction(result.data), new OtherAction()]),
-  )),
-).subscribe();
-```
+@Directive()
+abstract class Parent {
+  @ActionHandler(Action)
+  parentOne() {
+    console.log('parent 1');
+  }
+  
+  @ActionHandler(Action)
+  parentTwo() {
+    console.log('parent 2');
+  }
+  
+  @ActionHandler(Action)
+  parentThree() {
+    console.log('parent 3');
+  }
+}
 
-### dispatchOnError
-
-Dispatch one or more actions when source emits error.
-Errored Observable will be replaced with rxjs `EMPTY` Observable (won't rethrow an error),
-so use `catchError` instead of `dispatchOnError`,
-if you want to add additional error handling.
-
-```ts
-Actions.onAction(SomeAction).pipe(
-  mergeMap((action: SomeAction) => doSomethingAsync(someAction.payload).pipe(
-    dispatchOnError((error: unknown) => new ErrorAction()),
-    // dispatchOnError((result) => [new ErrorAction(), new OtherAction()]),
-  )),
-).subscribe();
-```
-
-## Change Detection
-
-You may need to manually trigger component change detection to update view on action trigger, because action handler is just a subscription under the hood.
-This isn't required if you store view data in Observable and subscribe to it using `async` pipe.  
-
-```ts
-import { ChangeDetectorRef } from '@angular/core';
-
-@WithActionHandlers()
-@Component({
-  template: '<div>Counter: {{counter}}</div>' // <-- view value
-})
-export class SomeComponent {
-  counter = 0; // <-- property
-
-  constructor(
-    private cdr: ChangeDetectorRef,
-  ) {
+@Component(...)
+class Child extends Parent {
+  constructor() {
+    super();
     initActionHandlers(this);
+    
+    Actions.dispatch(new Action());
+    // parent 3 // parent parentThree()
+    // child 1 // child parentOne()
+    // parent 2 // child super.parentTwo()
+    // child 2 // child parentTwo()
+    // child 3 // child childThree()
   }
 
-  @ActionHandler(SyncAction)
-  someActionHandler() {
-    this.counter += 1;
-    this.cdr.markForCheck(); // <-- trigger change detection to update view
+  @ActionHandler(Action)
+  parentOne() {
+    console.log('child 1');
   }
-
-  @AsyncActionHandler(AsyncAction)
-  someActionHandler(handle$) {
-    return handle$.pipe(
-      mergeMap(() => this.apiService.doSmth().pipe(
-        tap(() => {
-          this.counter += 1;
-          this.cdr.markForCheck(); // <-- trigger change detection to update view
-        }),
-      ))
-    );
+  
+  @ActionHandler(Action)
+  parentTwo() {
+    super.parentTwo(); // super call
+    console.log('child 2');
+  }
+  
+  @ActionHandler(Action)
+  childThree() {
+    console.log('child 3');
   }
 }
-```
-
-## How action handler decorators work under the hood
-
-```ts
-@ActionHandler(Action)
-actionHandler(action: Action): void {
-  console.log('result');
-}
-
-// is equivalent to
-
-Actions.onAction(Action).pipe(
-  takeUntil(...),
-).subscribe(
-  () => {
-    console.log('result');
-  }
-);
-```
-
-```ts
-@AsyncActionHandler(Action)
-actionHandler(handle$: Observable<Action>): Observable<any> {
-  handle$.pipe(
-    mergeMap((action: Action) => doSomethingAsync(action)),
-    tap((result) => {
-      console.log('result');
-    })
-  )
-}
-
-// is equivalent to
-
-Actions.onAction(Action).pipe(
-  mergeMap((action: Action) => doSomethingAsync(action)),
-  tap((result) => {
-    console.log('result');
-  }),
-  takeUntil(...),
-).subscribe();
 ```

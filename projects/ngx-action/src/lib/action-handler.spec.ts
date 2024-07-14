@@ -3,7 +3,6 @@ import { TestBed }                          from '@angular/core/testing';
 import { ActionHandler }                    from './action-handler';
 import { Actions }                          from './actions';
 import { initActionHandlers }               from './init-action-handlers';
-import { WithActionHandlers }               from './with-action-handlers';
 
 const componentActionHandlerSpy = jasmine.createSpy();
 const componentMultipleActionHandlerSpy = jasmine.createSpy();
@@ -25,16 +24,15 @@ class SyncAction2 {}
 
 // ---------- Component ----------
 @Component({selector: 'any', template: ''})
-class ParentComponentWithActionHandlers {
+class ParentComponent {
   @ActionHandler(SyncAction)
   public overwrittenActionHandler(action: SyncAction): void {
     componentParentOverwrittenActionHandlerSpy(action);
   }
 }
 
-@WithActionHandlers()
 @Component({selector: 'selector', template: ''})
-class ComponentWithActionHandlers extends ParentComponentWithActionHandlers {
+class ChildComponent extends ParentComponent {
   constructor() {
     super();
     initActionHandlers(this);
@@ -58,16 +56,15 @@ class ComponentWithActionHandlers extends ParentComponentWithActionHandlers {
 
 // ---------- Directive ----------
 @Directive()
-class ParentDirectiveWithActionHandlers {
+class ParentDirective {
   @ActionHandler(SyncAction)
   public overwrittenActionHandler(action: SyncAction): void {
     directiveParentOverwrittenActionHandlerSpy(action);
   }
 }
 
-@WithActionHandlers()
 @Directive({selector: '[directive]'})
-class DirectiveWithActionHandlers extends ParentDirectiveWithActionHandlers {
+class ChildDirective extends ParentDirective {
   constructor() {
     super();
     initActionHandlers(this);
@@ -93,16 +90,15 @@ class DirectiveWithActionHandlers extends ParentDirectiveWithActionHandlers {
 export class DirectiveContainer {}
 
 // ---------- Service ----------
-class ParentServiceWithActionHandlers {
+class ParentService {
   @ActionHandler(SyncAction)
   public overwrittenActionHandler(action: SyncAction): void {
     serviceParentOverwrittenActionHandlerSpy(action);
   }
 }
 
-@WithActionHandlers()
 @Injectable()
-class ServiceWithActionHandlers extends ParentServiceWithActionHandlers {
+class ChildService extends ParentService {
   constructor() {
     super();
     initActionHandlers(this);
@@ -124,9 +120,9 @@ class ServiceWithActionHandlers extends ParentServiceWithActionHandlers {
   }
 }
 
-@Component({selector: 'service-container', template: '', providers: [ServiceWithActionHandlers]})
+@Component({selector: 'service-container', template: '', providers: [ChildService]})
 export class ServiceContainer {
-  constructor(public service: ServiceWithActionHandlers) {
+  constructor(public service: ChildService) {
   }
 }
 
@@ -134,9 +130,9 @@ describe('should subscribe to action -', () => {
   it('component', () => {
     componentActionHandlerSpy.calls.reset();
     TestBed.configureTestingModule({
-      declarations: [ComponentWithActionHandlers],
+      declarations: [ChildComponent],
     }).compileComponents();
-    TestBed.createComponent(ComponentWithActionHandlers);
+    TestBed.createComponent(ChildComponent);
     const action = new SyncAction();
 
     Actions.dispatch(action);
@@ -148,7 +144,7 @@ describe('should subscribe to action -', () => {
   it('directive', () => {
     directiveActionHandlerSpy.calls.reset();
     TestBed.configureTestingModule({
-      declarations: [DirectiveWithActionHandlers, DirectiveContainer],
+      declarations: [ChildDirective, DirectiveContainer],
     }).compileComponents();
     TestBed.createComponent(DirectiveContainer);
     const action = new SyncAction();
@@ -178,9 +174,9 @@ describe('should subscribe to multiple actions -', () => {
   it('component', () => {
     componentMultipleActionHandlerSpy.calls.reset();
     TestBed.configureTestingModule({
-      declarations: [ComponentWithActionHandlers],
+      declarations: [ChildComponent],
     }).compileComponents();
-    TestBed.createComponent(ComponentWithActionHandlers);
+    TestBed.createComponent(ChildComponent);
     const action = new SyncAction();
     const action2 = new SyncAction2();
 
@@ -195,7 +191,7 @@ describe('should subscribe to multiple actions -', () => {
   it('directive', () => {
     directiveMultipleActionHandlerSpy.calls.reset();
     TestBed.configureTestingModule({
-      declarations: [DirectiveWithActionHandlers, DirectiveContainer],
+      declarations: [ChildDirective, DirectiveContainer],
     }).compileComponents();
     TestBed.createComponent(DirectiveContainer);
     const action = new SyncAction();
@@ -227,13 +223,13 @@ describe('should subscribe to multiple actions -', () => {
   });
 });
 
-describe('should unsubscribe to destroy of', () => {
+describe('should unsubscribe on destroy of', () => {
   it('component', () => {
     componentActionHandlerSpy.calls.reset();
     TestBed.configureTestingModule({
-      declarations: [ComponentWithActionHandlers],
+      declarations: [ChildComponent],
     }).compileComponents();
-    const component = TestBed.createComponent(ComponentWithActionHandlers);
+    const component = TestBed.createComponent(ChildComponent);
     const action = new SyncAction();
 
     component.destroy();
@@ -245,7 +241,7 @@ describe('should unsubscribe to destroy of', () => {
   it('directive', () => {
     directiveActionHandlerSpy.calls.reset();
     TestBed.configureTestingModule({
-      declarations: [DirectiveWithActionHandlers, DirectiveContainer],
+      declarations: [ChildDirective, DirectiveContainer],
     }).compileComponents();
     const component = TestBed.createComponent(DirectiveContainer);
     const action = new SyncAction();
@@ -276,9 +272,9 @@ describe('should override parent action handler with the same name -', () => {
     componentParentOverwrittenActionHandlerSpy.calls.reset();
     componentChildOverwrittenActionHandlerSpy.calls.reset();
     TestBed.configureTestingModule({
-      declarations: [ComponentWithActionHandlers],
+      declarations: [ChildComponent],
     }).compileComponents();
-    TestBed.createComponent(ComponentWithActionHandlers);
+    TestBed.createComponent(ChildComponent);
     const action = new SyncAction();
 
     Actions.dispatch(action);
@@ -292,7 +288,7 @@ describe('should override parent action handler with the same name -', () => {
     directiveParentOverwrittenActionHandlerSpy.calls.reset();
     directiveChildOverwrittenActionHandlerSpy.calls.reset();
     TestBed.configureTestingModule({
-      declarations: [DirectiveWithActionHandlers, DirectiveContainer],
+      declarations: [ChildDirective, DirectiveContainer],
     }).compileComponents();
     TestBed.createComponent(DirectiveContainer);
     const action = new SyncAction();

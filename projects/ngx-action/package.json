@@ -1,22 +1,21 @@
 {
   "name": "ngx-action",
   "description": "Sync components of Angular application using actions and decorators.",
-  "version": "1.2.2",
+  "version": "2.0.0",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/anton-nikiforenko/ngx-action/tree/master/projects/ngx-action"
+    "url": "git+https://github.com/anton-nikiforenko/ngx-action.git"
   },
   "homepage": "https://github.com/anton-nikiforenko/ngx-action/tree/master/projects/ngx-action#readme",
   "bugs": {
     "url": "https://github.com/anton-nikiforenko/ngx-action/issues"
   },
   "keywords": [
-    "Angular",
-    "Angular action"
+    "Angular"
   ],
   "peerDependencies": {
-    "@angular/core": ">=13",
+    "@angular/core": ">=16",
     "rxjs": ">=7 <8"
   },
   "dependencies": {
